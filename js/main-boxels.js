@@ -98,9 +98,12 @@ function init() {
 	shadowCamera.position.set( 10, 4, 10 );
 	shadowCamera.lookAt( scene.position );
 
-	var light = new THREE.Mesh( new THREE.IcosahedronGeometry( 1, 3 ), new THREE.MeshBasicMaterial( { emissive: 0xffffff }) );
+	var light = new THREE.Mesh( new THREE.CylinderGeometry( 5, 6, 1, 36 ), new THREE.MeshBasicMaterial( { emissive: 0xffffff }) );
 	light.position.copy( shadowCamera.position );
 	scene.add( light );
+	light.lookAt( scene.position );
+	light.rotation.y += Math.PI / 2;
+	light.rotation.z += Math.PI / 2;
 
 	var b = new THREE.CameraHelper( shadowCamera );
 	//scene.add( b );
