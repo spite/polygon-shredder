@@ -3,7 +3,7 @@ The polygon shredder that takes many cubes and turns them into confetti
 
 ![](https://raw.githubusercontent.com/spite/polygon-shredder/master/snapshot.jpg)
 
-A WebGL experiment
+A WebGL experiment **write up coming soon!**
 
 # The MIT License (MIT)
 **Copyright &copy; 2016 Jaume Sanchez Elias**
