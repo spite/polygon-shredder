@@ -1,66 +1,81 @@
 <!DOCTYPE html>
 <html lang="en"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-		
-		<meta charset="utf-8">
-		
-		<style>
-			* { margin: 0; padding: 0;}
-			body{ overflow: hidden; font-family: tahoma, sans-serif; font-size: 12px; background-color: #202020;}
-			#container{ position: absolute; left: 0; top: 0; right: 0; bottom: 0;}
-			#intro{ position: absolute; left: 0; top: 0; padding: 40px; pointer-events: none; transition: opacity 250ms ease-out;}
-			#intro h1, #intro h2, #intro ul, #closeBtn, #minIntro{ font-family: Raleway, sans-serif; color: white; text-shadow: 0 -1px 0 black;}
-			#intro h1{ font-size: 53.5px; text-transform: uppercase; font-weight: bold; line-height: 1em;}
-			#intro h2{ font-size: 13px; text-transform: uppercase; font-weight: normal;}
-			#intro ul{ margin: 20px 20px 0 20px;}
-			#intro li{ font-weight: normal; font-size: 14px;}
-			#intro ul.controls{ margin: 10px 0 30px 40px; list-style-type: circle;}
-			#closeBtn{ font-size: 14px; border: 1px solid white; border-radius: 20px; display: inline; padding: 10px; pointer-events: auto; cursor: pointer; }
-			#closeBtn:hover{ color: red;}
-			.hidden{ opacity: 0 }
-			#closeBtn .hidden{ pointer-events: none; }
-			#minIntro{ position: absolute; left: 10px; bottom: 10px; }
-			#minIntro h1{ font-size: 24px; font-weight: bold; text-transform: uppercase;}
-			a{ color: inherit;}
-			a:hover{ color: #dedede;}
-		</style>
-		<link href='https://fonts.googleapis.com/css?family=Raleway:400,700' rel='stylesheet' type='text/css'>
 
-	</head>
-	<body>
+<head>
 
-		<div id="container" ></div>
+	<meta charset="utf-8">
+	<title>The Polygon Shredder</title>
 
-		<div id="intro" >
-			<h1>Polygon shredder</h1>
-			<h2>The polygon shredder that takes many cubes and turns them into confetti</h2>
-			<ul>
-				<li>Move mouse around, the particles will be generated following the mouse</li>
-				<li>Press space to pause, space again to resume</li>
-				<li>Click and drag to rotate the camera, use scroll to zoom in and out</li>
-				<li>Play with the controls and let's see what you can find!</li>
-			</ul>
-			<ul class="controls">
-				<li><b>Factor:</b> speed at which the particles move</li>
-				<li><b>Evolution:</b> the variation over time of the particles flow</li>
-				<li><b>Rotation:</b> speed at which the particle field auto-rotates</li>
-				<li><b>Radius:</b> radius of a sphere that repels particles</li>
-				<li><b>Pulsate:</b> if enabled, the sphere pulsates, pushing in and out</li>
-				<li><b>ScaleX/Y/Z:</b> set the scale of each axis of the particles</li>
-				<li><b>Scale:</b> change the overall scale of the particles</li>
-			</ul>
-			<p id="closeBtn" >Close this message</p>
-		</div>
+	<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
 
-		<div id="minIntro" >
-			<h1>Polygon shredder</h1>
-			<p>Jaume Sanchez · <a href="https://www.clicktorelease.com/" rel="external" >clicktorelease</a> · <a href="https://twitter.com/thespite" rel="external">Twitter</a> · <a href="https://github.com/spite/polygon-shredder" rel="external" >GitHub</a></p>
-		</div>
+	<meta property="og:url" content="https://www.clicktorelease.com/code/polygon-shredder"/>
 
-		<script src="js/three.js"></script>
-		<script src="js/OrbitControls.js"></script>
-		<script src="js/Simulation.js"></script>
-		<script src="js/dat.gui.min.js"></script>
-		<script src="js/main-boxels.js"></script>
+	<meta property="og:title" content="The Polygon Shredder"/> 
+	<meta property="og:description" content="The polygon shredder that takes many cubes and turns them into confetti"/> 
+	<meta property="og:image" content="https://www.clicktorelease.com/code/polygon-shredder/thumb.jpg"/> 
+	<meta name="description" content="The polygon shredder that takes many cubes and turns them into confetti">
+	<meta itemprop="name" content="The Polygon Shredder">
+	<meta itemprop="description" content="The polygon shredder that takes many cubes and turns them into confetti">
+	<meta itemprop="image" content="https://www.clicktorelease.com/code/polygon-shredder/thumb.jpg">
+
+	<style>
+		* { margin: 0; padding: 0;}
+		body{ overflow: hidden; font-family: tahoma, sans-serif; font-size: 12px; background-color: #202020;}
+		#container{ position: absolute; left: 0; top: 0; right: 0; bottom: 0;}
+		#intro{ position: absolute; left: 0; top: 0; padding: 40px; pointer-events: none; transition: opacity 250ms ease-out;}
+		#intro h1, #intro h2, #intro ul, #closeBtn, #minIntro{ font-family: Raleway, sans-serif; color: white; text-shadow: 0 -1px 0 black;}
+		#intro h1{ font-size: 45.5px; text-transform: uppercase; font-weight: bold; line-height: 1em;}
+		#intro h2{ font-size: 11px; text-transform: uppercase; font-weight: normal;}
+		#intro ul{ margin: 20px 20px 0 20px;}
+		#intro li{ font-weight: normal; font-size: 11px;}
+		#intro ul.controls{ margin: 10px 0 30px 40px; list-style-type: circle;}
+		#closeBtn{ font-size: 14px; border: 1px solid white; border-radius: 20px; display: inline; padding: 10px; pointer-events: auto; cursor: pointer; }
+		#closeBtn:hover{ color: red;}
+		.hidden{ opacity: 0 }
+		#closeBtn .hidden{ pointer-events: none; }
+		#minIntro{ position: absolute; left: 10px; bottom: 10px; transition: opacity 250ms ease-out; }
+		#minIntro h1{ font-size: 24px; font-weight: bold; text-transform: uppercase;}
+		a{ color: inherit;}
+		a:hover{ color: #dedede;}
+	</style>
+	<link href='https://fonts.googleapis.com/css?family=Raleway:400,700' rel='stylesheet' type='text/css'>
+
+</head>
+<body>
+
+	<div id="container" ></div>
+
+	<div id="intro" >
+		<h1>Polygon shredder</h1>
+		<h2>The polygon shredder that takes many cubes and turns them into confetti</h2>
+		<ul>
+			<li><b>Move mouse</b> around, the particles will be generated following the mouse</li>
+			<li>Press <b>space to pause</b>, space again to resume</li>
+			<li><b>Click and drag</b> to rotate the camera, use scroll to zoom in and out</li>
+			<li>Play with the <b>controls</b> and let's see what you can find!</li>
+		</ul>
+		<ul class="controls">
+			<li><b>Factor:</b> speed at which the particles move</li>
+			<li><b>Evolution:</b> the variation over time of the particles flow</li>
+			<li><b>Rotation:</b> speed at which the particle field auto-rotates</li>
+			<li><b>Radius:</b> radius of a sphere that repels particles</li>
+			<li><b>Pulsate:</b> if enabled, the sphere pulsates, pushing in and out</li>
+			<li><b>ScaleX/Y/Z:</b> set the scale of each axis of the particles</li>
+			<li><b>Scale:</b> change the overall scale of the particles</li>
+		</ul>
+		<p id="closeBtn" >Close this message</p>
+	</div>
+
+	<div id="minIntro" class="hidden">
+		<h1>Polygon shredder</h1>
+		<p>Jaume Sanchez · <a href="https://www.clicktorelease.com/" rel="external" >clicktorelease</a> · <a href="https://twitter.com/thespite" rel="external">Twitter</a> · <a href="https://github.com/spite/polygon-shredder" rel="external" >GitHub</a></p>
+	</div>
+
+<script src="js/three.js"></script>
+<script src="js/OrbitControls.js"></script>
+<script src="js/Simulation.js"></script>
+<script src="js/dat.gui.min.js"></script>
+<script src="js/main-boxels.js"></script>
 
 <script id="texture_vertex_simulation_shader" type="x-shader/x-vertex">
 		
@@ -272,7 +287,7 @@ void main() {
 	//speedInc *= 2. * ( 1. - ( life / 100. ) );
 	//speedInc *= .25;
 
-	vec3 v = factor * speedInc * delta * speed * ( curlNoise( .2 * pos + factor * evolution * timer ) );
+	vec3 v = factor * speedInc * delta * speed * ( curlNoise( .2 * pos + factor * evolution * .1 * timer ) );
 	//vec3 v = speedInc * delta * speed * ( snoiseVec3( .2 * pos + 5. * timer ) );
 	pos += v;
 	life -= factor * 1.;
@@ -280,12 +295,6 @@ void main() {
 	if( length( pos ) < radius ) {
 		pos = normalize( pos ) * radius;
 	}
-
-	//if( pos.z < 0. ) pos.z *= -1.;
-
-	/*if( length( pos - vec3( 2. ) ) < 1.5 ) {
-		pos = vec3( 2. ) + normalize( pos - vec3( 2. ) ) * 1.5;
-	}*/
 
 	if( life <= 0. || reset == 1. ) {
 
@@ -330,6 +339,7 @@ uniform vec3 boxScale;
 uniform float meshScale;
 
 varying vec3 vPosition;
+varying vec3 vPosition2;
 varying vec4 vColor;
 
 varying vec4 vShadowCoord;
@@ -429,6 +439,7 @@ void main() {
 
 	vec4 mVP = viewMatrix * vec4( nPosition, 1. );
 	vPosition = mVP.xyz;
+	vPosition2 = nPosition.xyz;
 	gl_Position = projectionMatrix * mVP;
 
 	vShadowCoord = biasMatrix * shadowP * shadowV * vec4( nPosition, 1. );
@@ -448,6 +459,7 @@ precision highp float;
 uniform float spread;
 
 varying vec3 vPosition;
+varying vec3 vPosition2;
 varying vec4 vColor;
 
 varying vec4 vShadowCoord;
@@ -488,8 +500,8 @@ void main() {
 
 	vec2 resolution = vec2( 2048 );
 
-	vec3 fdx = vec3(dFdx(vPosition.x),dFdx(vPosition.y),dFdx(vPosition.z));
-	vec3 fdy = vec3(dFdy(vPosition.x),dFdy(vPosition.y),dFdy(vPosition.z));
+	vec3 fdx = vec3(dFdx(vPosition2.x),dFdx(vPosition2.y),dFdx(vPosition2.z));
+	vec3 fdy = vec3(dFdy(vPosition2.x),dFdy(vPosition2.y),dFdy(vPosition2.z));
 	vec3 n = normalize(cross(fdx,fdy));
 
 	vec4 base = vec4( 1. );
