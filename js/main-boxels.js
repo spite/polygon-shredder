@@ -384,8 +384,8 @@ function render() {
 		proxy.position.copy( nOffset );
 	}
 
-	var time = t.getElapsedTime();
-	var delta = t.getDelta();
+	var delta = t.getDelta() * 10;
+	var time = t.elapsedTime;
 
 	tmpVector.copy( nOffset );
 	tmpVector.sub( sim.simulationShader.uniforms.offset.value );

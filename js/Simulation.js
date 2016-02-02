@@ -276,9 +276,8 @@ function Simulation( renderer, width, height ) {
 
 Simulation.prototype.render = function( time, delta ) {
 
-	//simulationShader.uniforms.impulse.value = .5;
-	this.simulationShader.uniforms.timer.value = .1 * time;
-	this.simulationShader.uniforms.delta.value = .16;//0. * delta;
+	this.simulationShader.uniforms.timer.value = time;
+	this.simulationShader.uniforms.delta.value = delta;
 
 	this.simulationShader.uniforms.tPositions.value = this.targets[ this.targetPos ];
 	this.targetPos = 1 - this.targetPos;
