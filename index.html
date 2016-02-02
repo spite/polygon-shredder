@@ -22,16 +22,18 @@
 		* { margin: 0; padding: 0;}
 		body{ overflow: hidden; font-family: tahoma, sans-serif; font-size: 12px; background-color: #202020;}
 		#container{ position: absolute; left: 0; top: 0; right: 0; bottom: 0;}
-		#intro{ position: absolute; left: 0; top: 0; padding: 40px; pointer-events: none; transition: opacity 250ms ease-out;}
+		#intro{ position: absolute; left: 0; top: 0; padding: 40px; pointer-events: none; transition: opacity 250ms ease-out; color: white;}
 		#intro h1, #intro h2, #intro ul, #closeBtn, #minIntro{ font-family: Raleway, sans-serif; color: white; text-shadow: 0 -1px 0 black;}
 		#intro h1{ font-size: 45.5px; text-transform: uppercase; font-weight: bold; line-height: 1em;}
 		#intro h2{ font-size: 11px; text-transform: uppercase; font-weight: normal;}
 		#intro ul{ margin: 20px 20px 0 20px;}
 		#intro li{ font-weight: normal; font-size: 11px;}
-		#intro ul.controls{ margin: 10px 0 30px 40px; list-style-type: circle;}
+		#intro ul.controls{ margin: 10px 0 10px 40px; list-style-type: circle;}
 		#closeBtn{ font-size: 14px; border: 1px solid white; border-radius: 20px; display: inline; padding: 10px; pointer-events: auto; cursor: pointer; }
 		#closeBtn:hover{ color: red;}
 		.hidden{ opacity: 0 }
+		#sizes{ margin-bottom: 30px; margin-left: 10px;}
+		#sizes a{ pointer-events: auto;}
 		#closeBtn .hidden{ pointer-events: none; }
 		#minIntro{ position: absolute; left: 10px; bottom: 10px; transition: opacity 250ms ease-out; }
 		#minIntro h1{ font-size: 24px; font-weight: bold; text-transform: uppercase;}
@@ -63,6 +65,7 @@
 			<li><b>ScaleX/Y/Z:</b> set the scale of each axis of the particles</li>
 			<li><b>Scale:</b> change the overall scale of the particles</li>
 		</ul>
+		<p id="sizes">Too many? Too litte?<br/>Try <a href="#32" >almost none</a>, <a href="#64" >a few</a>, <a href="#128" >some</a>, <a href="#256" >regular</a>, <a href="#512" >quite a few</a>, <a href="#1024" >a lot</a>, <a href="#2048" >INSANE</a></p>
 		<p id="closeBtn" >Close this message</p>
 	</div>
 
@@ -75,6 +78,7 @@
 <script src="js/OrbitControls.js"></script>
 <script src="js/Simulation.js"></script>
 <script src="js/dat.gui.min.js"></script>
+<script src="js/Detector.js"></script>
 <script src="js/main-boxels.js"></script>
 
 <script id="texture_vertex_simulation_shader" type="x-shader/x-vertex">
@@ -466,7 +470,6 @@ varying vec4 vShadowCoord;
 uniform sampler2D depthTexture;
 uniform sampler2D projector;
 varying vec3 vLightPosition;
-uniform float shadowType;
 
 varying float vSequence;
 
@@ -589,6 +592,10 @@ for( var j = 0; j < links.length; j++ ) {
 	}, false );
 }
 
+window.addEventListener( 'hashchange', function( e ) {
+	window.location = e.newURL;
+	window.location.reload()
+} );
 
 </script>
 

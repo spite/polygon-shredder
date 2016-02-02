@@ -14,7 +14,11 @@ function check() {
 
 }
 
-window.addEventListener( 'load', check, false );
+if( Detector.webgl ) {
+	window.addEventListener( 'load', check, false );
+} else {
+
+}
 
 var container;
 
@@ -98,12 +102,19 @@ function init() {
 	shadowCamera.position.set( 10, 4, 10 );
 	shadowCamera.lookAt( scene.position );
 
-	var light = new THREE.Mesh( new THREE.CylinderGeometry( 5, 6, 1, 36 ), new THREE.MeshBasicMaterial( { emissive: 0xffffff }) );
+	var light = new THREE.Mesh( new THREE.CylinderGeometry( 5, 6, 1, 36 ), new THREE.MeshBasicMaterial( { color: 0xffffff }) );
 	light.position.copy( shadowCamera.position );
 	scene.add( light );
 	light.lookAt( scene.position );
 	light.rotation.y += Math.PI / 2;
 	light.rotation.z += Math.PI / 2;
+
+	var encasing = new THREE.Mesh( new THREE.CylinderGeometry( 5.1, 6.1, .9, 36 ), new THREE.MeshBasicMaterial( { color: 0x101010 }) );
+	encasing.position.copy( shadowCamera.position );
+	scene.add( encasing );
+	encasing.lookAt( scene.position );
+	encasing.rotation.y += Math.PI / 2;
+	encasing.rotation.z += Math.PI / 2;
 
 	var b = new THREE.CameraHelper( shadowCamera );
 	//scene.add( b );
@@ -173,8 +184,7 @@ function init() {
 			resolution: { type: 'v2', value: new THREE.Vector2( shadowBufferSize, shadowBufferSize ) },
 			lightPosition: { type: 'v3', value: new THREE.Vector3() },
 			projector: { type: 't', value: THREE.ImageUtils.loadTexture( 'spotlight.jpg' ) },
-			shadowType: { type: 'f', value: 2 },
-
+			
 			boxVertices: { type: '3fv', value: [ 
 				
 				-1,-1,-1,
@@ -409,7 +419,6 @@ function render() {
 	material.uniforms.map.value = shadowMaterial.uniforms.map.value = sim.targets[ sim.targetPos ];
 	material.uniforms.prevMap.value = shadowMaterial.uniforms.prevMap.value = sim.targets[ 1 - sim.targetPos ];
 	
-	material.uniforms.shadowType.value = params.type;
 	material.uniforms.spread.value = params.spread;
 	material.uniforms.timer.value = shadowMaterial.uniforms.timer.value = time;
 	material.uniforms.boxScale.value.set( params.scaleX, params.scaleY, params.scaleZ );
