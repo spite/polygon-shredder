@@ -341,7 +341,7 @@ function init() {
 
 	//gui.add( params, 'type', { 'none': 0, 'single': 1, 'multisample': 2, 'poisson': 3 } );
 	//gui.add( params, 'spread', 0, 10 );
-	gui.add( params, 'factor', 0, 1 );
+	gui.add( params, 'factor', 0.1, 1 );
 	gui.add( params, 'evolution', 0, 1 );
 	gui.add( params, 'rotation', 0, 1 );
 	gui.add( params, 'radius', 0, 4 );
