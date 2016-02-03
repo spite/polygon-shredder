@@ -19,7 +19,7 @@
 	<meta itemprop="image" content="https://www.clicktorelease.com/code/polygon-shredder/thumb.jpg">
 
 	<style>
-		* { margin: 0; padding: 0;}
+		* { margin: 0; padding: 0; -webkit-user-select: none; -moz-user-select: none}
 		body{ overflow: hidden; font-family: tahoma, sans-serif; font-size: 12px; background-color: #202020;}
 		#container{ position: absolute; left: 0; top: 0; right: 0; bottom: 0;}
 		#intro{ position: absolute; left: 0; top: 0; padding: 40px; pointer-events: none; transition: opacity 250ms ease-out; color: white;}
@@ -37,8 +37,10 @@
 		#closeBtn .hidden{ pointer-events: none; }
 		#minIntro{ position: absolute; left: 10px; bottom: 10px; transition: opacity 250ms ease-out; }
 		#minIntro h1{ font-size: 24px; font-weight: bold; text-transform: uppercase;}
+		.hidden #closeBtn, .hidden #sizes a{ pointer-events: none;}
 		a{ color: inherit;}
 		a:hover{ color: #dedede;}
+		#error{ position: absolute; left: 50%; top: 50%; text-align: center; transform: translate3d( -50%, -50%, 0 ); color: white; font-size: 14px; line-height: 1.4em; border: 1px solid white; padding:40px; border-radius: 20px; transition: opacity 250ms ease-out; pointer-events: none;}
 	</style>
 	<link href='https://fonts.googleapis.com/css?family=Raleway:400,700' rel='stylesheet' type='text/css'>
 
@@ -74,6 +76,11 @@
 		<p>Jaume Sanchez · <a href="https://www.clicktorelease.com/" rel="external" >clicktorelease</a> · <a href="https://twitter.com/thespite" rel="external">Twitter</a> · <a href="https://github.com/spite/polygon-shredder" rel="external" >GitHub</a></p>
 	</div>
 
+	<div id="error" class="hidden">
+		<p>I'm sorry, no fallback for no working WebGL.<br/>Also, support for mobile coming soon (?)</p>
+	</div>
+
+<script src="js/isMobile.min.js"></script>
 <script src="js/three.js"></script>
 <script src="js/OrbitControls.js"></script>
 <script src="js/Simulation.js"></script>

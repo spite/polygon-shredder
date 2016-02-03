@@ -14,10 +14,12 @@ function check() {
 
 }
 
-if( Detector.webgl ) {
+if( Detector.webgl && !isMobile.any ) {
 	window.addEventListener( 'load', check, false );
 } else {
-
+	document.getElementById( 'error' ).classList.remove( 'hidden' );
+	document.getElementById( 'intro' ).classList.add( 'hidden' );
+	document.getElementById( 'minIntro' ).classList.remove( 'hidden' );
 }
 
 var container;
@@ -75,9 +77,11 @@ var params = {
 	scale: 1
 };
 
-var gui = new dat.GUI();
+var gui;
 
 function init() {
+
+	gui = new dat.GUI();
 
 	container = document.getElementById( 'container' );
 
