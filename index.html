@@ -25,7 +25,7 @@
 		#intro{ position: absolute; left: 0; top: 0; padding: 40px; pointer-events: none; transition: opacity 250ms ease-out; color: white;}
 		#intro h1, #intro h2, #intro ul, #closeBtn, #minIntro{ font-family: Raleway, sans-serif; color: white; text-shadow: 0 -1px 0 black;}
 		#intro h1{ font-size: 45.5px; text-transform: uppercase; font-weight: bold; line-height: 1em;}
-		#intro h2{ font-size: 11px; text-transform: uppercase; font-weight: normal;}
+		#intro h2{ font-size: 11px; text-transform: uppercase; font-weight: normal; margin-bottom: 1em;}
 		#intro ul{ margin: 20px 20px 0 20px;}
 		#intro li{ font-weight: normal; font-size: 11px;}
 		#intro ul.controls{ margin: 10px 0 10px 40px; list-style-type: circle;}
@@ -33,11 +33,11 @@
 		#closeBtn:hover{ color: red;}
 		.hidden{ opacity: 0 }
 		#sizes{ margin-bottom: 30px; margin-left: 10px;}
-		#sizes a{ pointer-events: auto;}
+		#intro a{ pointer-events: auto;}
 		#closeBtn .hidden{ pointer-events: none; }
 		#minIntro{ position: absolute; left: 10px; bottom: 10px; transition: opacity 250ms ease-out; }
 		#minIntro h1{ font-size: 24px; font-weight: bold; text-transform: uppercase;}
-		.hidden #closeBtn, .hidden #sizes a{ pointer-events: none;}
+		.hidden #closeBtn, .hidden a, #intro.hidden a{ pointer-events: none;}
 		a{ color: inherit;}
 		a:hover{ color: #dedede;}
 		#error{ position: absolute; left: 50%; top: 50%; text-align: center; transform: translate3d( -50%, -50%, 0 ); color: white; font-size: 14px; line-height: 1.4em; border: 1px solid white; padding:40px; border-radius: 20px; transition: opacity 250ms ease-out; pointer-events: none;}
@@ -52,6 +52,7 @@
 	<div id="intro" >
 		<h1>Polygon shredder</h1>
 		<h2>The polygon shredder that takes many cubes and turns them into confetti</h2>
+		<p>Jaume Sanchez · <a href="https://www.clicktorelease.com/" rel="external" >clicktorelease</a> · <a href="https://twitter.com/thespite" rel="external">Twitter</a> · <a href="https://github.com/spite/polygon-shredder" rel="external" >GitHub</a></p>
 		<ul>
 			<li><b>Move mouse</b> around, the particles will be generated following the mouse</li>
 			<li>Press <b>space to pause</b>, space again to resume</li>
