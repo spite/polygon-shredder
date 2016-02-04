@@ -14,8 +14,37 @@ function check() {
 
 }
 
+var size = 256;
+var inFrame = false;
+
 if( Detector.webgl && !isMobile.any ) {
+
+	if( window.location.hash.indexOf( 'frame' ) != -1 ) {
+
+		document.getElementById( 'intro' ).classList.add( 'hidden' );
+		document.getElementById( 'minIntro' ).classList.add( 'hidden' );
+
+		var size;
+
+		var re = /#frame.([\d]+)/; 
+		var str = window.location.hash;
+		var m;
+
+		if ((m = re.exec(str)) !== null) {
+			if (m.index === re.lastIndex) {
+				re.lastIndex++;
+			}
+			
+			size = m[ 1 ];
+		}
+		inFrame = true;
+
+	} else {
+		size = parseInt( window.location.hash.substr(1) ) || 256; 
+	}
+
 	window.addEventListener( 'load', check, false );
+
 } else {
 	document.getElementById( 'error' ).classList.remove( 'hidden' );
 	document.getElementById( 'intro' ).classList.add( 'hidden' );
@@ -81,7 +110,23 @@ var gui;
 
 function init() {
 
-	gui = new dat.GUI();
+	if( !inFrame ) {
+
+		gui = new dat.GUI();
+
+			//gui.add( params, 'type', { 'none': 0, 'single': 1, 'multisample': 2, 'poisson': 3 } );
+		//gui.add( params, 'spread', 0, 10 );
+		gui.add( params, 'factor', 0.1, 1 );
+		gui.add( params, 'evolution', 0, 1 );
+		gui.add( params, 'rotation', 0, 1 );
+		gui.add( params, 'radius', 0, 4 );
+		gui.add( params, 'pulsate' );
+		gui.add( params, 'scaleX', .1, 10 );
+		gui.add( params, 'scaleY', .1, 10 );
+		gui.add( params, 'scaleZ', .1, 10 );
+		gui.add( params, 'scale', .1, 2 );
+
+	}
 
 	container = document.getElementById( 'container' );
 
@@ -125,7 +170,6 @@ function init() {
 
 	controls = new THREE.OrbitControls( camera, renderer.domElement );
 
-	var size = parseInt( window.location.hash.substr(1) ) || 256; 
 	sim = new Simulation( renderer, size, size );
 
 	shadowBufferSize = 2048;
@@ -154,15 +198,15 @@ function init() {
 
 	geometry.addAttribute( 'position', new THREE.BufferAttribute( positions, 3 ) );
 
-	var diffuseData = new Uint8Array( size * size * 4 );
-	for( var j = 0; j < size * size * 4; j += 4 ) {
+	var diffuseData = new Uint8Array( sim.width * sim.height * 4 );
+	for( var j = 0; j < sim.width * sim.height * 4; j += 4 ) {
 		var c = new THREE.Color( colors[ ~~( Math.random() * colors.length ) ] );
 		diffuseData[ j + 0 ] = c.r * 255;
 		diffuseData[ j + 1 ] = c.g * 255;
 		diffuseData[ j + 2 ] = c.b * 255;
 	}
 
-	var diffuseTexture = new THREE.DataTexture( diffuseData, size, size, THREE.RGBAFormat );
+	var diffuseTexture = new THREE.DataTexture( diffuseData, sim.width, sim.height, THREE.RGBAFormat );
 	diffuseTexture.minFilter = THREE.NearestFilter;
 	diffuseTexture.magFilter = THREE.NearestFilter;
 	diffuseTexture.needsUpdate = true;
@@ -353,18 +397,6 @@ function init() {
 	shadowDebug = new THREE.Mesh( new THREE.PlaneGeometry( 10,10 ), new THREE.MeshBasicMaterial( { map: shadowBuffer, side: THREE.DoubleSide } ) );
 	//scene.add( shadowDebug );
 
-	//gui.add( params, 'type', { 'none': 0, 'single': 1, 'multisample': 2, 'poisson': 3 } );
-	//gui.add( params, 'spread', 0, 10 );
-	gui.add( params, 'factor', 0.1, 1 );
-	gui.add( params, 'evolution', 0, 1 );
-	gui.add( params, 'rotation', 0, 1 );
-	gui.add( params, 'radius', 0, 4 );
-	gui.add( params, 'pulsate' );
-	gui.add( params, 'scaleX', .1, 10 );
-	gui.add( params, 'scaleY', .1, 10 );
-	gui.add( params, 'scaleZ', .1, 10 );
-	gui.add( params, 'scale', .1, 2 );
-
 	animate();
 
 }
@@ -400,6 +432,11 @@ function render() {
 
 	var delta = t.getDelta() * 10;
 	var time = t.elapsedTime;
+
+	if( inFrame ) {
+		var r = 3;
+		nOffset.set( r * Math.sin( time ), r * Math.cos( .9 * time ), 0 );
+	}
 
 	tmpVector.copy( nOffset );
 	tmpVector.sub( sim.simulationShader.uniforms.offset.value );
