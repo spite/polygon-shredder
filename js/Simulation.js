@@ -56,13 +56,13 @@ function Simulation( renderer, width, height ) {
 	this.texture.magFilter = THREE.NearestFilter;
 	this.texture.needsUpdate = true;
 
-	this.rtTexturePos = new THREE.WebGLRenderTarget(this.width, this.height, {
+	this.rtTexturePos = new THREE.WebGLRenderTarget( this.width, this.height, {
 		wrapS: THREE.RepeatWrapping,
 		wrapT: THREE.RepeatWrapping,
 		minFilter: THREE.NearestFilter,
 		magFilter: THREE.NearestFilter,
 		format: THREE.RGBAFormat,
-		type: THREE.FloatType,
+		type: isMobile.any? THREE.HalfFloatType : THREE.FloatType,
 		stencilBuffer: false
 	});
 

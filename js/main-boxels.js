@@ -9,22 +9,36 @@ function checkFloatTextures() {
 
 function check() {
 	
-	checkFloatTextures();
-	init();
+	if( checkFloatTextures() ) init();
 
 }
 
-var size = 256;
+var size
 var inFrame = false;
+var presetsDesktop = [
+	{ name: 'almost none', q: 32 },
+	{ name: 'a few', q: 64 },
+	{ name: 'some', q: 128 },
+	{ name: 'regular', q: 256 },
+	{ name: 'quite a few', q: 512 },
+	{ name: 'a lot', q: 1024 },
+	{ name: 'INSANE', q: 2048 }
+]
+var presetMobile = [
+	{ name: '64', q: 8 },
+	{ name: '256', q: 16 },
+	{ name: '1024', q: 32 },
+	{ name: '4096', q: 64 },
+	{ name: '16384', q: 128 },
+	{ name: '65536', q: 256 }
+]
 
-if( Detector.webgl && !isMobile.any ) {
+if( Detector.webgl ) {//&& !isMobile.any ) {
 
 	if( window.location.hash.indexOf( 'frame' ) != -1 ) {
 
 		document.getElementById( 'intro' ).classList.add( 'hidden' );
 		document.getElementById( 'minIntro' ).classList.add( 'hidden' );
-
-		var size;
 
 		var re = /#frame.([\d]+)/; 
 		var str = window.location.hash;
@@ -40,10 +54,12 @@ if( Detector.webgl && !isMobile.any ) {
 		inFrame = true;
 
 	} else {
-		size = parseInt( window.location.hash.substr(1) ) || 256; 
+		size = parseInt( window.location.hash.substr(1) ) || ( isMobile.any ? 32 : 256 ); 
 	}
 
-	window.addEventListener( 'load', check, false );
+	if( checkFloatTextures() ) {
+		window.addEventListener( 'load', init, false );
+	}
 
 } else {
 	document.getElementById( 'error' ).classList.remove( 'hidden' );
@@ -114,7 +130,7 @@ function init() {
 
 		gui = new dat.GUI();
 
-			//gui.add( params, 'type', { 'none': 0, 'single': 1, 'multisample': 2, 'poisson': 3 } );
+		//gui.add( params, 'type', { 'none': 0, 'single': 1, 'multisample': 2, 'poisson': 3 } );
 		//gui.add( params, 'spread', 0, 10 );
 		gui.add( params, 'factor', 0.1, 1 );
 		gui.add( params, 'evolution', 0, 1 );
@@ -126,6 +142,19 @@ function init() {
 		gui.add( params, 'scaleZ', .1, 10 );
 		gui.add( params, 'scale', .1, 2 );
 
+		if( isMobile.any ) gui.close();
+
+		var sizeOptions = document.getElementById( 'size-options' );
+		var presets = isMobile.any ? presetMobile : presetsDesktop;
+		presets.forEach( function( p ) { 
+			var span = document.createElement( 'span' );
+			var a = document.createElement( 'a' );
+			a.textContent = p.name;
+			a.setAttribute( 'href', '#' + p.q );
+			span.appendChild( a );
+			sizeOptions.appendChild( span );
+		} );
+		
 	}
 
 	container = document.getElementById( 'container' );
@@ -172,14 +201,15 @@ function init() {
 
 	sim = new Simulation( renderer, size, size );
 
-	shadowBufferSize = 2048;
+	shadowBufferSize = Math.min( isMobile.any ? 1024 : 2048, renderer.context.getParameter(renderer.context.MAX_TEXTURE_SIZE) );
+	console.log( shadowBufferSize );
 	shadowBuffer = new THREE.WebGLRenderTarget( shadowBufferSize, shadowBufferSize, {
 		wrapS: THREE.ClampToEdgeWrapping,
 		wrapT: THREE.ClampToEdgeWrapping,
 		minFilter: THREE.LinearMipMapLinear,
 		magFilter: THREE.LinearFilter,
 		format: THREE.RGBAFormat,
-		type: THREE.FloatType,
+		type: isMobile.any? THREE.HalfFloatType : THREE.FloatType,
 		stencilBuffer: false
 	} );
 
@@ -220,6 +250,7 @@ function init() {
 			diffuse: { type: 't', value: diffuseTexture },
 			width: { type: "f", value: sim.width },
 			height: { type: "f", value: sim.height },
+			dimensions: { type: 'v2', value: new THREE.Vector2( shadowBufferSize, shadowBufferSize ) },
 
 			timer: { type: 'f', value: 0 },
 			spread: { type: 'f', value: 4 },
@@ -238,7 +269,7 @@ function init() {
 				-1,-1,-1,
 				-1,-1, 1,
 				-1, 1, 1,
-				
+
 				-1,-1,-1,
 				-1, 1, 1,
 				-1, 1,-1,
@@ -258,6 +289,30 @@ function init() {
 				1,-1, 1,
 				-1,-1,-1,
 				1,-1,-1,
+
+				1, 1, 1,
+				1,-1, 1,
+				1,-1,-1,
+
+				1, 1,-1,
+				1, 1, 1,
+				1,-1,-1,
+
+				-1,-1, 1,
+				1,-1, 1,
+				1, 1, 1,
+
+				-1, 1, 1,
+				-1,-1, 1,
+				1, 1, 1,
+
+				-1, 1,-1,
+				-1, 1, 1,
+				1, 1, 1,
+
+				1, 1,-1,
+				-1, 1,-1,
+				1, 1, 1
 	
 			] },
 			boxNormals: { type: '3fv', value: [
@@ -300,7 +355,7 @@ function init() {
 				-1,-1,-1,
 				-1,-1, 1,
 				-1, 1, 1,
-				
+
 				-1,-1,-1,
 				-1, 1, 1,
 				-1, 1,-1,
@@ -320,6 +375,30 @@ function init() {
 				1,-1, 1,
 				-1,-1,-1,
 				1,-1,-1,
+
+				1, 1, 1,
+				1,-1, 1,
+				1,-1,-1,
+
+				1, 1,-1,
+				1, 1, 1,
+				1,-1,-1,
+
+				-1,-1, 1,
+				1,-1, 1,
+				1, 1, 1,
+
+				-1, 1, 1,
+				-1,-1, 1,
+				1, 1, 1,
+
+				-1, 1,-1,
+				-1, 1, 1,
+				1, 1, 1,
+
+				1, 1,-1,
+				-1, 1,-1,
+				1, 1, 1
 	
 			] },
 			boxNormals: { type: '3fv', value: [
@@ -397,6 +476,9 @@ function init() {
 	shadowDebug = new THREE.Mesh( new THREE.PlaneGeometry( 10,10 ), new THREE.MeshBasicMaterial( { map: shadowBuffer, side: THREE.DoubleSide } ) );
 	//scene.add( shadowDebug );
 
+	document.getElementById( 'loading' ).style.display = 'none';
+	document.getElementById( 'loaded' ).style.display = 'block';
+	
 	animate();
 
 }

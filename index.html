@@ -38,9 +38,20 @@
 		#minIntro{ position: absolute; left: 10px; bottom: 10px; transition: opacity 250ms ease-out; }
 		#minIntro h1{ font-size: 24px; font-weight: bold; text-transform: uppercase;}
 		.hidden #closeBtn, .hidden a, #intro.hidden a{ pointer-events: none;}
+		#size-options span:not(:last-child):after{ content: ', '; }
 		a{ color: inherit;}
 		a:hover{ color: #dedede;}
 		#error{ position: absolute; left: 50%; top: 50%; text-align: center; transform: translate3d( -50%, -50%, 0 ); color: white; font-size: 14px; line-height: 1.4em; border: 1px solid white; padding:40px; border-radius: 20px; transition: opacity 250ms ease-out; pointer-events: none;}
+		#loaded{ display: none }
+		#loading{ padding: 20px 0; text-align: center }
+		@media (max-width: 700px) {
+			body{ font-size: 14px;}
+			#intro h1{ font-size: 24px; }
+			#intro h2{ font-size: 16px;}
+			#instructions{ display: none;}
+			#sizes{ margin: 10px 0 40px 0;}
+			#minIntro{ text-align: center; width: 100%; }
+		}
 	</style>
 	<link href='https://fonts.googleapis.com/css?family=Raleway:400,700' rel='stylesheet' type='text/css'>
 
@@ -53,23 +64,28 @@
 		<h1>Polygon shredder</h1>
 		<h2>The polygon shredder that takes many cubes and turns them into confetti</h2>
 		<p>Jaume Sanchez · <a href="https://www.clicktorelease.com/" rel="external" >clicktorelease</a> · <a href="https://twitter.com/thespite" rel="external">Twitter</a> · <a href="https://github.com/spite/polygon-shredder" rel="external" >GitHub</a></p>
-		<ul>
-			<li><b>Move mouse</b> around, the particles will be generated following the mouse</li>
-			<li>Press <b>space to pause</b>, space again to resume</li>
-			<li><b>Click and drag</b> to rotate the camera, use scroll to zoom in and out</li>
-			<li>Play with the <b>controls</b> and let's see what you can find!</li>
-		</ul>
-		<ul class="controls">
-			<li><b>Factor:</b> speed at which the particles move</li>
-			<li><b>Evolution:</b> the variation over time of the particles flow</li>
-			<li><b>Rotation:</b> speed at which the particle field auto-rotates</li>
-			<li><b>Radius:</b> radius of a sphere that repels particles</li>
-			<li><b>Pulsate:</b> if enabled, the sphere pulsates, pushing in and out</li>
-			<li><b>ScaleX/Y/Z:</b> set the scale of each axis of the particles</li>
-			<li><b>Scale:</b> change the overall scale of the particles</li>
-		</ul>
-		<p id="sizes">Too many? Too litte?<br/>Try <a href="#32" >almost none</a>, <a href="#64" >a few</a>, <a href="#128" >some</a>, <a href="#256" >regular</a>, <a href="#512" >quite a few</a>, <a href="#1024" >a lot</a>, <a href="#2048" >INSANE</a></p>
-		<p id="closeBtn" >Close this message</p>
+		<div id="loading" >Loading...</div>
+		<div id="loaded" >
+			<div id="instructions" >
+				<ul>
+					<li><b>Move mouse</b> around, the particles will be generated following the mouse</li>
+					<li>Press <b>space to pause</b>, space again to resume</li>
+					<li><b>Click and drag</b> to rotate the camera, use scroll to zoom in and out</li>
+					<li>Play with the <b>controls</b> and let's see what you can find!</li>
+				</ul>
+				<ul class="controls">
+					<li><b>Factor:</b> speed at which the particles move</li>
+					<li><b>Evolution:</b> the variation over time of the particles flow</li>
+					<li><b>Rotation:</b> speed at which the particle field auto-rotates</li>
+					<li><b>Radius:</b> radius of a sphere that repels particles</li>
+					<li><b>Pulsate:</b> if enabled, the sphere pulsates, pushing in and out</li>
+					<li><b>ScaleX/Y/Z:</b> set the scale of each axis of the particles</li>
+					<li><b>Scale:</b> change the overall scale of the particles</li>
+				</ul>
+			</div>
+			<p id="sizes">Too many? Too litte?<br/>Try <span id="size-options" ></span></p>
+			<p id="closeBtn" >Close this message</p>
+		</div>
 	</div>
 
 	<div id="minIntro" class="hidden">
@@ -78,7 +94,7 @@
 	</div>
 
 	<div id="error" class="hidden">
-		<p>I'm sorry, no fallback for no working WebGL.<br/>Also, support for mobile coming soon (?)</p>
+		<p>I'm sorry, no fallback for browsers with no working WebGL.</p>
 	</div>
 
 <script src="js/isMobile.min.js"></script>
@@ -221,7 +237,6 @@ vec3 snoiseVec3( vec3 x ){
 
 }
 
-
 vec3 curlNoise( vec3 p ){
  
 	const float e = .1;
@@ -262,6 +277,95 @@ vec3 curlNoise2( vec3 p ) {
 	return normalize( noiseVelocity );
 
 }
+
+vec4 snoiseD(vec3 v) { //returns vec4(value, dx, dy, dz)
+  const vec2  C = vec2(1.0/6.0, 1.0/3.0) ;
+  const vec4  D = vec4(0.0, 0.5, 1.0, 2.0);
+ 
+  vec3 i  = floor(v + dot(v, C.yyy) );
+  vec3 x0 =   v - i + dot(i, C.xxx) ;
+ 
+  vec3 g = step(x0.yzx, x0.xyz);
+  vec3 l = 1.0 - g;
+  vec3 i1 = min( g.xyz, l.zxy );
+  vec3 i2 = max( g.xyz, l.zxy );
+ 
+  vec3 x1 = x0 - i1 + C.xxx;
+  vec3 x2 = x0 - i2 + C.yyy;
+  vec3 x3 = x0 - D.yyy;
+ 
+  i = mod289(i);
+  vec4 p = permute( permute( permute(
+             i.z + vec4(0.0, i1.z, i2.z, 1.0 ))
+           + i.y + vec4(0.0, i1.y, i2.y, 1.0 ))
+           + i.x + vec4(0.0, i1.x, i2.x, 1.0 ));
+ 
+  float n_ = 0.142857142857; // 1.0/7.0
+  vec3  ns = n_ * D.wyz - D.xzx;
+ 
+  vec4 j = p - 49.0 * floor(p * ns.z * ns.z);
+ 
+  vec4 x_ = floor(j * ns.z);
+  vec4 y_ = floor(j - 7.0 * x_ );
+ 
+  vec4 x = x_ *ns.x + ns.yyyy;
+  vec4 y = y_ *ns.x + ns.yyyy;
+  vec4 h = 1.0 - abs(x) - abs(y);
+ 
+  vec4 b0 = vec4( x.xy, y.xy );
+  vec4 b1 = vec4( x.zw, y.zw );
+ 
+  vec4 s0 = floor(b0)*2.0 + 1.0;
+  vec4 s1 = floor(b1)*2.0 + 1.0;
+  vec4 sh = -step(h, vec4(0.0));
+ 
+  vec4 a0 = b0.xzyw + s0.xzyw*sh.xxyy ;
+  vec4 a1 = b1.xzyw + s1.xzyw*sh.zzww ;
+ 
+  vec3 p0 = vec3(a0.xy,h.x);
+  vec3 p1 = vec3(a0.zw,h.y);
+  vec3 p2 = vec3(a1.xy,h.z);
+  vec3 p3 = vec3(a1.zw,h.w);
+ 
+  vec4 norm = taylorInvSqrt(vec4(dot(p0,p0), dot(p1,p1), dot(p2, p2), dot(p3,p3)));
+  p0 *= norm.x;
+  p1 *= norm.y;
+  p2 *= norm.z;
+  p3 *= norm.w;
+ 
+  vec4 values = vec4( dot(p0,x0), dot(p1,x1), dot(p2,x2), dot(p3,x3) ); //value of contributions from each corner (extrapolate the gradient)
+ 
+  vec4 m = max(0.5 - vec4(dot(x0,x0), dot(x1,x1), dot(x2,x2), dot(x3,x3)), 0.0); //kernel function from each corner
+ 
+  vec4 m2 = m * m;
+  vec4 m3 = m * m * m;
+ 
+  vec4 temp = -6.0 * m2 * values;
+  float dx = temp[0] * x0.x + temp[1] * x1.x + temp[2] * x2.x + temp[3] * x3.x + m3[0] * p0.x + m3[1] * p1.x + m3[2] * p2.x + m3[3] * p3.x;
+  float dy = temp[0] * x0.y + temp[1] * x1.y + temp[2] * x2.y + temp[3] * x3.y + m3[0] * p0.y + m3[1] * p1.y + m3[2] * p2.y + m3[3] * p3.y;
+  float dz = temp[0] * x0.z + temp[1] * x1.z + temp[2] * x2.z + temp[3] * x3.z + m3[0] * p0.z + m3[1] * p1.z + m3[2] * p2.z + m3[3] * p3.z;
+ 
+  return vec4(dot(m3, values), dx, dy, dz) * 42.0;
+}
+
+
+vec3 curlNoise3 (vec3 p) {
+
+    vec3 xNoisePotentialDerivatives = snoiseD( p ).yzw; //yzw are the xyz derivatives
+    vec3 yNoisePotentialDerivatives = snoiseD(vec3( p.y - 19.1 , p.z + 33.4 , p.x + 47.2 )).zwy;
+    vec3 zNoisePotentialDerivatives = snoiseD(vec3( p.z + 74.2 , p.x - 124.5 , p.y + 99.4 )).wyz;
+    vec3 noiseVelocity = vec3(
+        zNoisePotentialDerivatives.y - yNoisePotentialDerivatives.z,
+        xNoisePotentialDerivatives.z - zNoisePotentialDerivatives.x,
+        yNoisePotentialDerivatives.x - xNoisePotentialDerivatives.y
+    );
+	
+	const float e = .1;
+	const float divisor = 1.0 / ( 2.0 * e );
+	return normalize( noiseVelocity * divisor );
+
+}
+
 
 varying vec2 vUv;
 varying vec3 vOffset;
@@ -355,7 +459,7 @@ uniform vec3 cameraPosition;
 uniform sampler2D map;
 uniform sampler2D prevMap;
 
-uniform vec3 boxVertices[ 18 ];
+uniform vec3 boxVertices[ 36 ];
 uniform vec3 boxNormals[ 3 ];
 
 uniform float width;
@@ -426,7 +530,7 @@ void main() {
 
 	vec2 dimensions = vec2( width, height );
 
-	float px = position.x / 18.;
+	/*float px = position.x / 18.;
 	float vi = mod( position.x, 18. );
 	float x = mod( px , dimensions.x );
 	float y = mod( floor( px / dimensions.x ), dimensions.y );
@@ -439,7 +543,7 @@ void main() {
 	vec4 col = texture2D( map, vUv );
 	vec4 prev = texture2D( prevMap, vUv );
 	//col = floor( col * 10. ) / 10.;
-	vec3 pos = ( modelMatrix * vec4( col.xyz, 1. ) ).xyz;
+	vec3 pos = col.xyz;
 	vec3 n = boxNormals[ int( vi / 6. ) ];
 	float alpha = col.a / 100.;
 	
@@ -456,7 +560,8 @@ void main() {
 	float d = dot( normalize( vVis ), normalize( rn.xyz ) );
 	vec3 c = boxVertices[ int( vi ) ];
 	if( d < 0. ) {
-		c += 2. * n; // flip it!
+		//c += 2. * n; // flip it!
+		c = boxVertices[ int( vi ) + 18 ];
 	}
 
 	c *= boxScale * scale * meshScale;
@@ -467,11 +572,38 @@ void main() {
 	vec4 mVP = viewMatrix * vec4( nPosition, 1. );
 	vPosition = mVP.xyz;
 	vPosition2 = nPosition.xyz;
-	gl_Position = projectionMatrix * mVP;
+	gl_Position = projectionMatrix * mVP;*/
 
-	vShadowCoord = biasMatrix * shadowP * shadowV * vec4( nPosition, 1. );
+	float px = position.x / 18.;
+	float vi = mod( position.x, 18. );
+	float x = mod( px, dimensions.x );
+	float y = mod( floor( px / dimensions.x ), dimensions.y );
+	vec2 uv = vec2( x, y ) / dimensions;
 
-	vColor = texture2D( diffuse, vUv );
+	vec4 cubePositions = texture2D( map, uv );
+	vec4 prevPosition = texture2D( prevMap, uv );
+	float alpha = cubePositions.a / 100.;
+	float scale = .025 * parabola( 1. - alpha, 1. );
+	vec3 faceNormal = boxNormals[ int( vi / 6. ) ];
+	vec3 boxVertex = boxVertices[ int( vi ) ];
+	mat4 localRotation = mat4( calcLookAtMatrix( cubePositions.xyz, prevPosition.xyz, 0. ) );
+
+	vec4 rotatedNormal = localRotation * vec4( faceNormal, 1. );
+	vec3 visPosition = cubePositions.xyz + rotatedNormal.xyz * scale;
+	float d = dot( normalize( visPosition - cameraPosition ), normalize( rotatedNormal.xyz ) );
+	if( d < 0. ) {
+		boxVertex += 2. * faceNormal; // flip it!
+		boxVertex = boxVertices[ int( vi ) + 18 ];
+	}
+	vec3 modifiedVertex = ( ( localRotation * vec4( boxVertex * scale * boxScale * meshScale, 1. ) ).xyz );
+	vec3 modifiedPosition = cubePositions.xyz + modifiedVertex;
+
+	gl_Position = projectionMatrix * viewMatrix * vec4( modifiedPosition, 1.0 );
+	vPosition = ( viewMatrix * vec4( modifiedPosition, 1.0 ) ).xyz;
+
+	vShadowCoord = biasMatrix * shadowP * shadowV * vec4( modifiedPosition, 1. );
+
+	vColor = texture2D( diffuse, uv );
 	vLightPosition = ( vec4( lightPosition, 1. ) ).xyz;
 
 }
@@ -493,6 +625,7 @@ varying vec4 vShadowCoord;
 uniform sampler2D depthTexture;
 uniform sampler2D projector;
 varying vec3 vLightPosition;
+uniform vec2 resolution;
 
 varying float vSequence;
 
@@ -524,10 +657,8 @@ const float PI = 3.14159265358979323846264;
 
 void main() {
 
-	vec2 resolution = vec2( 2048 );
-
-	vec3 fdx = vec3(dFdx(vPosition2.x),dFdx(vPosition2.y),dFdx(vPosition2.z));
-	vec3 fdy = vec3(dFdy(vPosition2.x),dFdy(vPosition2.y),dFdy(vPosition2.z));
+	vec3 fdx = vec3(dFdx(vPosition.x),dFdx(vPosition.y),dFdx(vPosition.z));
+	vec3 fdy = vec3(dFdy(vPosition.x),dFdy(vPosition.y),dFdy(vPosition.z));
 	vec3 n = normalize(cross(fdx,fdy));
 
 	vec4 base = vec4( 1. );
