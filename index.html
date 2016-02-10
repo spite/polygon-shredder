@@ -612,17 +612,16 @@ void main() {
 	vec3 fdy = vec3(dFdy(vPosition.x),dFdy(vPosition.y),dFdy(vPosition.z));
 	vec3 n = normalize(cross(fdx,fdy));*/
 
-	vec3 dPositiondx = dFdx(vPosition);
-	vec3 dPositiondy = dFdy(vPosition);
-	vec3 n = normalize(cross(dPositiondx, dPositiondy));
+	vec3 fdx = dFdx( vPosition );
+	vec3 fdy = dFdy( vPosition );
+	vec3 n = normalize(cross(fdx, fdy));
 
 	vec4 base = vec4( 1. );
 
 	vec3 L = normalize( vLightPosition - vPosition );  
-	vec3 E = normalize(cameraPosition - vPosition);
+	vec3 E = normalize( cameraPosition - vPosition );
 
-	float diffuse = dot( L, n );
-	diffuse = max(0.0, diffuse);
+	float diffuse = max( 0., dot( L, n ) );
 
 	float theta = clamp( -diffuse, 0., 1. );
     bias = 0.005 * tan( acos( theta ) );
@@ -648,15 +647,14 @@ void main() {
 	float specular = dot(n, halfVector);
 	specular = max(0.0, specular);
 	specular = pow(specular, shininess);
-	
-	float rimPower = 1.;
-	float f = rimPower * abs( dot( n, normalize( -vPosition ) ) );
-	f = ( 1. - smoothstep( 0.0, 1., f ) );
-	f = pow( f, 3. );
 
 	float ambient = .2;
 	float o = diffuse * shadow * mask.r;
-	base.rgb = clamp( vColor.rgb * mix( vec3( o ), vec3( 1., 1., 1. ), ambient ) + vec3( 1. ) * ( specular + f ) * o, vec3( 0. ), vec3( 1. ) );
+	vec3 color = mix( vColor.rgb, vec3( 1. ), .8 * clamp( -n.y, 0., 1. ) );
+	vec3 diffuseColor = color * mix( vec3( o ), vec3( 1. ), ambient );
+	vec3 specularColor = vec3( 1. );
+
+	base.rgb = mix( diffuseColor, specularColor, specular * o );
 
 	gl_FragColor = base;
 
