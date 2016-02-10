@@ -405,7 +405,11 @@ function init() {
 
 				1, 0, 0,
 				0, 0, 1,
-				0, 1, 0
+				0, 1, 0,
+
+				-1, 0, 0,
+				0, 0, -1,
+				0, -1, 0
 
 			] },
 
@@ -443,6 +447,13 @@ function init() {
 
 		mouse.x = ( e.clientX / renderer.domElement.clientWidth ) * 2 - 1;
 		mouse.y = - ( e.clientY / renderer.domElement.clientHeight ) * 2 + 1;
+
+	});
+
+	renderer.domElement.addEventListener( 'touchmove', function( e ) {
+
+		mouse.x = ( e.touches[ 0 ].clientX / renderer.domElement.clientWidth ) * 2 - 1;
+		mouse.y = - ( e.touches[ 0 ].clientY / renderer.domElement.clientHeight ) * 2 + 1;
 
 	});
 
@@ -492,6 +503,7 @@ function animate() {
 
 var t = new THREE.Clock();
 var m = new THREE.Matrix4();
+var v = new THREE.Vector3();
 
 var tmpVector = new THREE.Vector3();
 
@@ -557,9 +569,13 @@ function render() {
 	tmpVector.sub( shadowCamera.position );
 	tmpVector.normalize();
 	
+	m.makeRotationY( -mesh.rotation.y );
+	v.copy( shadowCamera.position );
+	v.applyMatrix4( m );
+
 	material.uniforms.shadowP.value.copy( shadowCamera.projectionMatrix );
 	material.uniforms.shadowV.value.copy( shadowCamera.matrixWorldInverse );
-	material.uniforms.lightPosition.value.copy( shadowCamera.position );
+	material.uniforms.lightPosition.value.copy( v );
 	
 	renderer.setClearColor( 0x202020 );
 	mesh.material = material;

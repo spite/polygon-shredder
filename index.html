@@ -470,7 +470,6 @@ uniform vec3 boxScale;
 uniform float meshScale;
 
 varying vec3 vPosition;
-varying vec3 vPosition2;
 varying vec4 vColor;
 
 varying vec4 vShadowCoord;
@@ -530,81 +529,33 @@ void main() {
 
 	vec2 dimensions = vec2( width, height );
 
-	/*float px = position.x / 18.;
-	float vi = mod( position.x, 18. );
-	float x = mod( px , dimensions.x );
-	float y = mod( floor( px / dimensions.x ), dimensions.y );
-
-	float u = x / dimensions.x;
-	float v = y / dimensions.y;
-	vec2 vUv = vec2( u, v );
-	vSequence = y * dimensions.x + x;
-
-	vec4 col = texture2D( map, vUv );
-	vec4 prev = texture2D( prevMap, vUv );
-	//col = floor( col * 10. ) / 10.;
-	vec3 pos = col.xyz;
-	vec3 n = boxNormals[ int( vi / 6. ) ];
-	float alpha = col.a / 100.;
-	
-	float scale = .1 * alpha;
-	scale = .025 * parabola( 1. - alpha, 1. );
-
-	//mat4 rm = rotationMatrix( vec3( 0., 1., 0. ), alpha * 3.14159 );
-	//mat4 rm = rotationMatrix( col.xyz, 1. * alpha * 3.14159 + 0. * timer );
-	mat4 rm = mat4( calcLookAtMatrix( col.xyz, prev.xyz, 0. ) );//3.14159 / 4. + 0. * timer );
-	//float rm = 1.;
-	vec4 rn = rm * vec4( n, 1. );
-	vec3 visPosition = pos.xyz + rn.xyz * scale;
-	vec3 vVis = visPosition - cameraPosition;
-	float d = dot( normalize( vVis ), normalize( rn.xyz ) );
-	vec3 c = boxVertices[ int( vi ) ];
-	if( d < 0. ) {
-		//c += 2. * n; // flip it!
-		c = boxVertices[ int( vi ) + 18 ];
-	}
-
-	c *= boxScale * scale * meshScale;
-
-	vec3 nn = ( ( rm * vec4( c, 1. ) ).xyz );
-	vec3 nPosition = pos.xyz + nn;	
-
-	vec4 mVP = viewMatrix * vec4( nPosition, 1. );
-	vPosition = mVP.xyz;
-	vPosition2 = nPosition.xyz;
-	gl_Position = projectionMatrix * mVP;*/
-
 	float px = position.x / 18.;
 	float vi = mod( position.x, 18. );
 	float x = mod( px, dimensions.x );
 	float y = mod( floor( px / dimensions.x ), dimensions.y );
 	vec2 uv = vec2( x, y ) / dimensions;
 
-	vec4 cubePositions = texture2D( map, uv );
+	vec4 cubePosition = texture2D( map, uv );
 	vec4 prevPosition = texture2D( prevMap, uv );
-	float alpha = cubePositions.a / 100.;
+	float alpha = cubePosition.a / 100.;
 	float scale = .025 * parabola( 1. - alpha, 1. );
 	vec3 faceNormal = boxNormals[ int( vi / 6. ) ];
-	vec3 boxVertex = boxVertices[ int( vi ) ];
-	mat4 localRotation = mat4( calcLookAtMatrix( cubePositions.xyz, prevPosition.xyz, 0. ) );
+	mat4 localRotation = mat4( calcLookAtMatrix( cubePosition.xyz, prevPosition.xyz, 0. ) );
 
 	vec4 rotatedNormal = localRotation * vec4( faceNormal, 1. );
-	vec3 visPosition = cubePositions.xyz + rotatedNormal.xyz * scale;
-	float d = dot( normalize( visPosition - cameraPosition ), normalize( rotatedNormal.xyz ) );
-	if( d < 0. ) {
-		boxVertex += 2. * faceNormal; // flip it!
-		boxVertex = boxVertices[ int( vi ) + 18 ];
-	}
+	vec3 visPosition = ( modelMatrix * ( cubePosition + rotatedNormal * scale ) ).xyz;
+	float d = dot( normalize( visPosition - cameraPosition ), normalize( ( modelMatrix * rotatedNormal ).xyz ) );
+	vec3 boxVertex = boxVertices[ int( vi + ( 1. - step( 0., d ) ) * 18. ) ];
 	vec3 modifiedVertex = ( ( localRotation * vec4( boxVertex * scale * boxScale * meshScale, 1. ) ).xyz );
-	vec3 modifiedPosition = cubePositions.xyz + modifiedVertex;
+	vec3 modifiedPosition = cubePosition.xyz + modifiedVertex;
 
-	gl_Position = projectionMatrix * viewMatrix * vec4( modifiedPosition, 1.0 );
-	vPosition = ( viewMatrix * vec4( modifiedPosition, 1.0 ) ).xyz;
+	gl_Position = projectionMatrix * modelViewMatrix * vec4( modifiedPosition, 1.0 );
+	vPosition = modifiedPosition;
 
-	vShadowCoord = biasMatrix * shadowP * shadowV * vec4( modifiedPosition, 1. );
+	vShadowCoord = biasMatrix * shadowP * shadowV * modelMatrix * vec4( modifiedPosition, 1. );
 
 	vColor = texture2D( diffuse, uv );
-	vLightPosition = ( vec4( lightPosition, 1. ) ).xyz;
+	vLightPosition = lightPosition;
 
 }
 
@@ -618,7 +569,6 @@ precision highp float;
 uniform float spread;
 
 varying vec3 vPosition;
-varying vec3 vPosition2;
 varying vec4 vColor;
 
 varying vec4 vShadowCoord;
@@ -626,6 +576,7 @@ uniform sampler2D depthTexture;
 uniform sampler2D projector;
 varying vec3 vLightPosition;
 uniform vec2 resolution;
+uniform vec3 cameraPosition;
 
 varying float vSequence;
 
@@ -657,17 +608,21 @@ const float PI = 3.14159265358979323846264;
 
 void main() {
 
-	vec3 fdx = vec3(dFdx(vPosition.x),dFdx(vPosition.y),dFdx(vPosition.z));
+/*	vec3 fdx = vec3(dFdx(vPosition.x),dFdx(vPosition.y),dFdx(vPosition.z));
 	vec3 fdy = vec3(dFdy(vPosition.x),dFdy(vPosition.y),dFdy(vPosition.z));
-	vec3 n = normalize(cross(fdx,fdy));
+	vec3 n = normalize(cross(fdx,fdy));*/
+
+	vec3 dPositiondx = dFdx(vPosition);
+	vec3 dPositiondy = dFdy(vPosition);
+	vec3 n = normalize(cross(dPositiondx, dPositiondy));
 
 	vec4 base = vec4( 1. );
 
-	vec3 L = normalize( vLightPosition );   
-	vec3 E = normalize( -vPosition ); 
-	vec3 R = normalize( -reflect( L, n ) );  
+	vec3 L = normalize( vLightPosition - vPosition );  
+	vec3 E = normalize(cameraPosition - vPosition);
 
-	float diffuse = dot( n, L );
+	float diffuse = dot( L, n );
+	diffuse = max(0.0, diffuse);
 
 	float theta = clamp( -diffuse, 0., 1. );
     bias = 0.005 * tan( acos( theta ) );
@@ -686,17 +641,16 @@ void main() {
 	shadow += sampleVisibility( shadowCoord + vec3(     0.,  inc.y, 0. ) );
 	shadow /= 5.;
 
-	if( diffuse < 0. ) shadow = 0.;
-
 	vec4 mask = texture2D( projector, vShadowCoord.xy );
 
-	float specular = 0.;
-
 	float shininess = 200.;
-	if( diffuse > 0. ) specular = pow( max( dot( R, E ), 0. ), shininess );
+	vec3 halfVector = normalize(E + L );
+	float specular = dot(n, halfVector);
+	specular = max(0.0, specular);
+	specular = pow(specular, shininess);
 	
 	float rimPower = 1.;
-	float f = rimPower * abs( dot( n, E ) );
+	float f = rimPower * abs( dot( n, normalize( -vPosition ) ) );
 	f = ( 1. - smoothstep( 0.0, 1., f ) );
 	f = pow( f, 3. );
 
