@@ -1,9 +1,14 @@
 'use strict'
 
+var halfFloatTextures = false, floatTextures = false;
+
 function checkFloatTextures() {
 
 	var ctx = document.createElement( 'canvas' ).getContext( 'experimental-webgl' );
-	return ctx.getExtension( 'OES_texture_half_float' );
+	floatTextures = ctx.getExtension( 'OES_texture_float' );
+	halfFloatTextures = ctx.getExtension( 'OES_texture_half_float' );
+
+	return floatTextures || halfFloatTextures
 
 }
 
@@ -57,9 +62,7 @@ if( Detector.webgl ) {//&& !isMobile.any ) {
 		size = parseInt( window.location.hash.substr(1) ) || ( isMobile.any ? 32 : 256 ); 
 	}
 
-	if( checkFloatTextures() ) {
-		window.addEventListener( 'load', init, false );
-	}
+	window.addEventListener( 'load', init, false );
 
 } else {
 	document.getElementById( 'error' ).classList.remove( 'hidden' );
@@ -206,11 +209,9 @@ function init() {
 	shadowBuffer = new THREE.WebGLRenderTarget( shadowBufferSize, shadowBufferSize, {
 		wrapS: THREE.ClampToEdgeWrapping,
 		wrapT: THREE.ClampToEdgeWrapping,
-		minFilter: THREE.LinearMipMapLinear,
-		magFilter: THREE.LinearFilter,
-		format: THREE.RGBAFormat,
-		type: isMobile.any? THREE.HalfFloatType : THREE.FloatType,
-		stencilBuffer: false
+		minFilter: isMobile.any? THREE.NearestFilter : THREE.LinearMipMapLinear,
+		magFilter: isMobile.any? THREE.NearestFilter : THREE.LinearFilter,
+		format: THREE.RGBAFormat
 	} );
 
 	var geometry = new THREE.BufferGeometry();

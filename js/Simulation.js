@@ -51,6 +51,9 @@ function Simulation( renderer, width, height ) {
 
 	}.bind( this ) );*/
 
+	
+	var floatType = isMobile.apple.device ? THREE.HalfFloatType : THREE.FloatType;
+
 	this.texture = new THREE.DataTexture( this.data, this.width, this.height, THREE.RGBAFormat, THREE.FloatType );
 	this.texture.minFilter = THREE.NearestFilter;
 	this.texture.magFilter = THREE.NearestFilter;
@@ -62,7 +65,7 @@ function Simulation( renderer, width, height ) {
 		minFilter: THREE.NearestFilter,
 		magFilter: THREE.NearestFilter,
 		format: THREE.RGBAFormat,
-		type: isMobile.any? THREE.HalfFloatType : THREE.FloatType,
+		type: floatType,
 		stencilBuffer: false
 	});
 
