@@ -60,13 +60,15 @@ function Simulation( renderer, width, height ) {
 	this.texture.needsUpdate = true;
 
 	this.rtTexturePos = new THREE.WebGLRenderTarget( this.width, this.height, {
-		wrapS: THREE.RepeatWrapping,
-		wrapT: THREE.RepeatWrapping,
+		wrapS: THREE.ClampToEdgeWrapping,
+		wrapT: THREE.ClampToEdgeWrapping,
 		minFilter: THREE.NearestFilter,
 		magFilter: THREE.NearestFilter,
 		format: THREE.RGBAFormat,
 		type: floatType,
-		stencilBuffer: false
+		stencilBuffer: false,
+		depthBuffer: false,
+		generateMipmaps: false
 	});
 
 	this.targets = [ this.rtTexturePos, this.rtTexturePos.clone() ];
