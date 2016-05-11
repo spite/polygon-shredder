@@ -529,8 +529,8 @@ void main() {
 
 	vec2 dimensions = vec2( width, height );
 
-	float px = position.x / 18.;
-	float vi = mod( position.x, 18. );
+	float px = position.y;
+	float vi = position.z;
 	float x = mod( px, dimensions.x );
 	float y = mod( floor( px / dimensions.x ), dimensions.y );
 	vec2 uv = vec2( x, y ) / dimensions;

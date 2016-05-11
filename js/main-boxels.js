@@ -221,9 +221,9 @@ function init() {
 
 	var p = 0;
 	for( var j = 0; j < positionsLength; j += 3 ) {
-		positions[ j ] = p;
-		positions[ j + 1 ] = 0;
-		positions[ j + 2 ] = 0;
+		positions[ j ] = p
+		positions[ j + 1 ] = Math.floor( p / 18 )
+		positions[ j + 2 ] = p % 18
 		p++;
 	}
 
