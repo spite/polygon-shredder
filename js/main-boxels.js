@@ -1,5 +1,7 @@
 'use strict'
 
+var vr = true;//false;
+
 var halfFloatTextures = false, floatTextures = false;
 
 function checkFloatTextures() {
@@ -14,7 +16,7 @@ function checkFloatTextures() {
 
 function check() {
 	
-	if( checkFloatTextures() ) init();
+	return checkFloatTextures();
 
 }
 
@@ -38,7 +40,7 @@ var presetMobile = [
 	{ name: '65536', q: 256 }
 ]
 
-if( Detector.webgl ) {//&& !isMobile.any ) {
+if( Detector.webgl && check() ){//&& !isMobile.any ) {
 
 	if( window.location.hash.indexOf( 'frame' ) != -1 ) {
 
@@ -126,6 +128,7 @@ var params = {
 };
 
 var gui;
+var manager, effect;
 
 function init() {
 
@@ -133,8 +136,8 @@ function init() {
 
 		gui = new dat.GUI();
 
-		//gui.add( params, 'type', { 'none': 0, 'single': 1, 'multisample': 2, 'poisson': 3 } );
-		//gui.add( params, 'spread', 0, 10 );
+		gui.add( params, 'type', { 'none': 0, 'single': 1, 'multisample': 2, 'poisson': 3 } );
+		gui.add( params, 'spread', 0, 10 );
 		gui.add( params, 'factor', 0.1, 1 );
 		gui.add( params, 'evolution', 0, 1 );
 		gui.add( params, 'rotation', 0, 1 );
@@ -200,7 +203,21 @@ function init() {
 	var b = new THREE.CameraHelper( shadowCamera );
 	//scene.add( b );
 
-	controls = new THREE.OrbitControls( camera, renderer.domElement );
+	if( vr ) {
+		effect = new THREE.VREffect( renderer );
+		controls = new THREE.VRControls( camera );
+		controls.standing = true;
+		effect.setSize( window.innerWidth, window.innerHeight );
+		
+		var vrParams = {
+			FORCE_ENABLE_VR: true,
+			hideButton: false, // Default: false.
+			isUndistorted: false // Default: false.
+		};
+		manager = new WebVRManager(renderer, effect, vrParams);
+	} else {
+		controls = new THREE.OrbitControls( camera, renderer.domElement );		
+	}
 
 	sim = new Simulation( renderer, size, size );
 
@@ -430,12 +447,14 @@ function init() {
 	//scene.add( center );
 
 	window.addEventListener( 'resize', onWindowResize, false );
+	window.addEventListener( 'vrdisplaypresentchange', onWindowResize, true );
 
 	function onWindowResize() {
 		
 		camera.aspect = window.innerWidth / window.innerHeight;
 		camera.updateProjectionMatrix();
 
+		if( vr ) effect.setSize( window.innerWidth, window.innerHeight );
 		renderer.setSize( window.innerWidth, window.innerHeight );
 		
 	}
@@ -508,7 +527,7 @@ var v = new THREE.Vector3();
 
 var tmpVector = new THREE.Vector3();
 
-function render() {
+function render( timestamp ) {
 
 	controls.update();
 
@@ -563,7 +582,7 @@ function render() {
 	shadowMaterial.uniforms.meshScale.value = params.scale;
 	
 	renderer.setClearColor( 0 );
-	mesh.material = shadowMaterial;
+	mesh.material = shadowMaterial;	
 	renderer.render( scene, shadowCamera, shadowBuffer );
 
 	tmpVector.copy( scene.position );
@@ -580,6 +599,10 @@ function render() {
 	
 	renderer.setClearColor( 0x202020 );
 	mesh.material = material;
-	renderer.render( scene, camera );
+	if( vr ) {
+		manager.render( scene, camera, timestamp );
+	} else {
+		renderer.render( scene, camera );
+	}
 
 }
