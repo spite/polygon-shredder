@@ -44,6 +44,9 @@
 		#error{ position: absolute; left: 50%; top: 50%; text-align: center; transform: translate3d( -50%, -50%, 0 ); color: white; font-size: 14px; line-height: 1.4em; border: 1px solid white; padding:40px; border-radius: 20px; transition: opacity 250ms ease-out; pointer-events: none;}
 		#loaded{ display: none }
 		#loading{ padding: 20px 0; text-align: center }
+		.twitter-share{ display: inline-block; margin-right: 30px; }
+		.share{ margin-bottom: 1em; pointer-events: auto }
+		.min-share{ display: block; margin-top: 5px; }
 		@media (max-width: 700px) {
 			body{ font-size: 14px;}
 			#intro h1{ font-size: 24px; }
@@ -58,12 +61,35 @@
 </head>
 <body>
 
+	<div id="fb-root"></div>
+	<script>(function(d, s, id) {
+		var js, fjs = d.getElementsByTagName(s)[0];
+		if (d.getElementById(id)) return;
+		js = d.createElement(s); js.id = id;
+		js.src = "//connect.facebook.net/en_GB/all.js#xfbml=1";
+		fjs.parentNode.insertBefore(js, fjs);
+	}(document, 'script', 'facebook-jssdk'));</script>
+
 	<div id="container" ></div>
 
 	<div id="intro" >
 		<h1>Polygon shredder</h1>
 		<h2>The polygon shredder that takes many cubes and turns them into confetti</h2>
+		
+		<div class="share">
+			<div class="twitter-share">
+				<a href="https://twitter.com/share" class="twitter-share-button" data-via="thespite" data-lang="en">Tweet</a>
+				<script>!function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0];if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src="https://platform.twitter.com/widgets.js";fjs.parentNode.insertBefore(js,fjs);}}(document,"script","twitter-wjs");</script>
+			</div>
+			
+			<script type="text/javascript" src="https://apis.google.com/js/plusone.js"></script>
+			<div class="g-plusone" data-size="medium" data-annotation="bubble"></div>
+			
+			<div class="fb-like" data-href="https://www.clicktorelease.com/code/polygon-shredder/" data-colorscheme="light" data-layout="button_count" data-action="like" data-show-faces="true" data-send="false"></div>
+		</div>
+
 		<p>Jaume Sanchez · <a href="https://www.clicktorelease.com/" rel="external" >clicktorelease</a> · <a href="https://twitter.com/thespite" rel="external">Twitter</a> · <a href="https://github.com/spite/polygon-shredder" rel="external" >GitHub</a></p>
+		
 		<div id="loading" >Loading...</div>
 		<div id="loaded" >
 			<div id="instructions" >
@@ -90,7 +116,18 @@
 
 	<div id="minIntro" class="hidden">
 		<h1>Polygon shredder</h1>
-		<p>Jaume Sanchez · <a href="https://www.clicktorelease.com/" rel="external" >clicktorelease</a> · <a href="https://twitter.com/thespite" rel="external">Twitter</a> · <a href="https://github.com/spite/polygon-shredder" rel="external" >GitHub</a></p>
+		<p>Jaume Sanchez · <a href="https://www.clicktorelease.com/" rel="external" >clicktorelease</a> · <a href="https://twitter.com/thespite" rel="external">Twitter</a> · <a href="https://github.com/spite/polygon-shredder" rel="external" >GitHub</a> <span class="min-share">
+			<div class="twitter-share">
+				<a href="https://twitter.com/share" class="twitter-share-button" data-via="thespite" data-lang="en">Tweet</a>
+				<script>!function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0];if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src="https://platform.twitter.com/widgets.js";fjs.parentNode.insertBefore(js,fjs);}}(document,"script","twitter-wjs");</script>
+			</div>
+			
+			<script type="text/javascript" src="https://apis.google.com/js/plusone.js"></script>
+			<div class="g-plusone" data-size="medium" data-annotation="bubble"></div>
+			
+			<div class="fb-like" data-href="https://www.clicktorelease.com/code/polygon-shredder/" data-colorscheme="light" data-layout="button_count" data-action="like" data-show-faces="true" data-send="false"></div>
+		</span>
+		</p>
 	</div>
 
 	<div id="error" class="hidden">
