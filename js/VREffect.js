@@ -11,6 +11,8 @@
 
 THREE.VREffect = function ( renderer, onError, onReady ) {
 
+	onReady = onReady || function() {}
+	
 	var vrHMD;
 	var isDeprecatedAPI = false;
 	var eyeTranslationL = new THREE.Vector3();
@@ -26,14 +28,12 @@ THREE.VREffect = function ( renderer, onError, onReady ) {
 
 				vrHMD = devices[ i ];
 				isDeprecatedAPI = false;
-				onReady( vrHMD )
 				break; // We keep the first we encounter
 
 			} else if ( 'HMDVRDevice' in window && devices[ i ] instanceof HMDVRDevice ) {
 
 				vrHMD = devices[ i ];
 				isDeprecatedAPI = true;
-				onReady( vrHMD )
 				break; // We keep the first we encounter
 
 			}
@@ -97,12 +97,6 @@ THREE.VREffect = function ( renderer, onError, onReady ) {
 
 	};
 
-	this.getStage = function() {
-
-		return vrHMD.stageParameters();
-
-	}
-
 	// fullscreen
 
 	var canvas = renderer.domElement;
@@ -111,7 +105,8 @@ THREE.VREffect = function ( renderer, onError, onReady ) {
 	document.addEventListener( fullscreenchange, function () {
 
 		isPresenting = isDeprecatedAPI && vrHMD && ( document.mozFullScreenElement || document.webkitFullscreenElement ) !== undefined;
-
+		isPresenting = true
+		
 		if ( isPresenting ) {
 
 			rendererPixelRatio = renderer.getPixelRatio();
@@ -133,6 +128,7 @@ THREE.VREffect = function ( renderer, onError, onReady ) {
 	window.addEventListener( 'vrdisplaypresentchange', function () {
 
 		isPresenting = vrHMD && vrHMD.isPresenting;
+		isPresenting = true
 
 		if ( isPresenting ) {
 
@@ -272,7 +268,7 @@ THREE.VREffect = function ( renderer, onError, onReady ) {
 			renderRectR = { x: size.width / 2, y: 0, width: size.width / 2, height: size.height };
 
 			renderer.setScissorTest( true );
-			//renderer.clear();
+			renderer.clear();
 
 			if ( camera.parent === null ) camera.updateMatrixWorld();
 

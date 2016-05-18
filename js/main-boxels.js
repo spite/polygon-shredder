@@ -447,7 +447,12 @@ function init() {
 	//scene.add( center );
 
 	window.addEventListener( 'resize', onWindowResize, false );
-	window.addEventListener( 'vrdisplaypresentchange', onWindowResize, true );
+	window.addEventListener( 'vrdisplaypresentchange', function() {
+		document.getElementById( 'intro' ).style.display = 'none';
+		document.getElementById( 'minIntro' ).style.display = 'none';
+		document.querySelector( '.dg' ).style.display = 'none';		
+		onWindowResize()
+	}, true );
 
 	function onWindowResize() {
 		

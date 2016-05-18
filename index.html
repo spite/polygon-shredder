@@ -64,6 +64,8 @@
 		<h1>Polygon shredder</h1>
 		<h2>The polygon shredder that takes many cubes and turns them into confetti</h2>
 		<p>Jaume Sanchez · <a href="https://www.clicktorelease.com/" rel="external" >clicktorelease</a> · <a href="https://twitter.com/thespite" rel="external">Twitter</a> · <a href="https://github.com/spite/polygon-shredder" rel="external" >GitHub</a></p>
+		<br/><p>Made using <a href="https://www.khronos.org/webgl/" rel="external">WebGL</a> with <a href="http://threejs.org/" rel="external" >three.js</a>, and <a href="http://webvr.info/" rel="external" >WebVR</a> with <a href="https://github.com/borismus/webvr-boilerplate" rel="external" >WebVR Boilerplate</a>.</p>
+			<p>Available for Google Cardboard, Oculus Rift and HTC Vive.</p>
 		<div id="loading" >Loading...</div>
 		<div id="loaded" >
 			<div id="instructions" >
@@ -89,12 +91,12 @@
 	</div>
 
 	<div id="minIntro" class="hidden">
-		<h1>Polygon shredder</h1>
+		<h1>Polygon shredder WebVR</h1>
 		<p>Jaume Sanchez · <a href="https://www.clicktorelease.com/" rel="external" >clicktorelease</a> · <a href="https://twitter.com/thespite" rel="external">Twitter</a> · <a href="https://github.com/spite/polygon-shredder" rel="external" >GitHub</a></p>
 	</div>
 
 	<div id="error" class="hidden">
-		<p>I'm sorry, no fallback for browsers with no working WebGL.</p>
+		<p>I'm sorry, no fallback for browsers with no working WebGL.<br/>Float textures required!</p>
 	</div>
 
 <script src="js/isMobile.min.js"></script>
@@ -120,7 +122,7 @@
 
 	void main() {
 
-		vOffset = ( inverseModelViewMatrix * vec4( offset, 1. ) ).xyz;
+		vOffset = vec3( 0. );//( inverseModelViewMatrix * vec4( offset, 1. ) ).xyz;
 		vUv = vec2(uv.x, 1.0 - uv.y);
 		gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );
 
