@@ -1,6 +1,8 @@
 # The Polygon Shredder
 The polygon shredder that takes many cubes and turns them into confetti
 
+[See the site here](https://www.clicktorelease.com/code/polygon-shredder/)
+
 ![](https://raw.githubusercontent.com/spite/polygon-shredder/master/snapshot.jpg)
 
 A WebGL experiment **write up coming soon!**
