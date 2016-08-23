@@ -12,7 +12,7 @@
 THREE.VREffect = function ( renderer, onError, onReady ) {
 
 	onReady = onReady || function() {}
-	
+
 	var vrHMD;
 	var isDeprecatedAPI = false;
 	var eyeTranslationL = new THREE.Vector3();
@@ -106,7 +106,7 @@ THREE.VREffect = function ( renderer, onError, onReady ) {
 
 		isPresenting = isDeprecatedAPI && vrHMD && ( document.mozFullScreenElement || document.webkitFullscreenElement ) !== undefined;
 		isPresenting = true
-		
+
 		if ( isPresenting ) {
 
 			rendererPixelRatio = renderer.getPixelRatio();
@@ -268,7 +268,7 @@ THREE.VREffect = function ( renderer, onError, onReady ) {
 			renderRectR = { x: size.width / 2, y: 0, width: size.width / 2, height: size.height };
 
 			renderer.setScissorTest( true );
-			renderer.clear();
+			//renderer.clear();
 
 			if ( camera.parent === null ) camera.updateMatrixWorld();
 

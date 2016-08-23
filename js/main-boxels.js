@@ -15,7 +15,7 @@ function checkFloatTextures() {
 }
 
 function check() {
-	
+
 	return checkFloatTextures();
 
 }
@@ -47,7 +47,7 @@ if( Detector.webgl && check() ){//&& !isMobile.any ) {
 		document.getElementById( 'intro' ).classList.add( 'hidden' );
 		document.getElementById( 'minIntro' ).classList.add( 'hidden' );
 
-		var re = /#frame.([\d]+)/; 
+		var re = /#frame.([\d]+)/;
 		var str = window.location.hash;
 		var m;
 
@@ -55,13 +55,13 @@ if( Detector.webgl && check() ){//&& !isMobile.any ) {
 			if (m.index === re.lastIndex) {
 				re.lastIndex++;
 			}
-			
+
 			size = m[ 1 ];
 		}
 		inFrame = true;
 
 	} else {
-		size = parseInt( window.location.hash.substr(1) ) || ( isMobile.any ? 32 : 256 ); 
+		size = parseInt( window.location.hash.substr(1) ) || ( isMobile.any ? 32 : 256 );
 	}
 
 	window.addEventListener( 'load', init, false );
@@ -121,10 +121,10 @@ var params = {
 	rotation: .5,
 	radius: 2,
 	pulsate: false,
-	scaleX: .1,
+	scaleX: 1,
 	scaleY: 1,
-	scaleZ: 5,
-	scale: 1
+	scaleZ: 2,
+	scale: .5
 };
 
 var gui;
@@ -148,11 +148,13 @@ function init() {
 		gui.add( params, 'scaleZ', .1, 10 );
 		gui.add( params, 'scale', .1, 2 );
 
+		document.querySelector( '.dg' ).style.display = 'none';
+
 		if( isMobile.any ) gui.close();
 
 		var sizeOptions = document.getElementById( 'size-options' );
 		var presets = isMobile.any ? presetMobile : presetsDesktop;
-		presets.forEach( function( p ) { 
+		presets.forEach( function( p ) {
 			var span = document.createElement( 'span' );
 			var a = document.createElement( 'a' );
 			a.textContent = p.name;
@@ -160,7 +162,7 @@ function init() {
 			span.appendChild( a );
 			sizeOptions.appendChild( span );
 		} );
-		
+
 	}
 
 	container = document.getElementById( 'container' );
@@ -208,7 +210,7 @@ function init() {
 		controls = new THREE.VRControls( camera );
 		controls.standing = true;
 		effect.setSize( window.innerWidth, window.innerHeight );
-		
+
 		var vrParams = {
 			FORCE_ENABLE_VR: true,
 			hideButton: false, // Default: false.
@@ -216,7 +218,7 @@ function init() {
 		};
 		manager = new WebVRManager(renderer, effect, vrParams);
 	} else {
-		controls = new THREE.OrbitControls( camera, renderer.domElement );		
+		controls = new THREE.OrbitControls( camera, renderer.domElement );
 	}
 
 	sim = new Simulation( renderer, size, size );
@@ -274,16 +276,16 @@ function init() {
 			spread: { type: 'f', value: 4 },
 			boxScale: { type: 'v3', value: new THREE.Vector3() },
 			meshScale: { type: 'f', value: 1 },
-			
+
 			depthTexture: { type: 't', value: shadowBuffer },
 			shadowV: { type: 'm4', value: new THREE.Matrix4() },
 			shadowP: { type: 'm4', value: new THREE.Matrix4() },
 			resolution: { type: 'v2', value: new THREE.Vector2( shadowBufferSize, shadowBufferSize ) },
 			lightPosition: { type: 'v3', value: new THREE.Vector3() },
 			projector: { type: 't', value: THREE.ImageUtils.loadTexture( 'spotlight.jpg' ) },
-			
-			boxVertices: { type: '3fv', value: [ 
-				
+
+			boxVertices: { type: '3fv', value: [
+
 				-1,-1,-1,
 				-1,-1, 1,
 				-1, 1, 1,
@@ -331,7 +333,7 @@ function init() {
 				1, 1,-1,
 				-1, 1,-1,
 				1, 1, 1
-	
+
 			] },
 			boxNormals: { type: '3fv', value: [
 
@@ -367,9 +369,9 @@ function init() {
 			shadowP: { type: 'm4', value: new THREE.Matrix4() },
 			resolution: { type: 'v2', value: new THREE.Vector2( shadowBufferSize, shadowBufferSize ) },
 			lightPosition: { type: 'v3', value: new THREE.Vector3() },
-			
-			boxVertices: { type: '3fv', value: [ 
-				
+
+			boxVertices: { type: '3fv', value: [
+
 				-1,-1,-1,
 				-1,-1, 1,
 				-1, 1, 1,
@@ -417,7 +419,7 @@ function init() {
 				1, 1,-1,
 				-1, 1,-1,
 				1, 1, 1
-	
+
 			] },
 			boxNormals: { type: '3fv', value: [
 
@@ -450,18 +452,18 @@ function init() {
 	window.addEventListener( 'vrdisplaypresentchange', function() {
 		document.getElementById( 'intro' ).style.display = 'none';
 		document.getElementById( 'minIntro' ).style.display = 'none';
-		document.querySelector( '.dg' ).style.display = 'none';		
+		document.querySelector( '.dg' ).style.display = 'none';
 		onWindowResize()
 	}, true );
 
 	function onWindowResize() {
-		
+
 		camera.aspect = window.innerWidth / window.innerHeight;
 		camera.updateProjectionMatrix();
 
-		if( vr ) effect.setSize( window.innerWidth, window.innerHeight );
-		renderer.setSize( window.innerWidth, window.innerHeight );
-		
+		effect.setSize( window.innerWidth, window.innerHeight );
+		//renderer.setSize( window.innerWidth, window.innerHeight );
+
 	}
 
 	onWindowResize();
@@ -514,12 +516,30 @@ function init() {
 
 	document.getElementById( 'loading' ).style.display = 'none';
 	document.getElementById( 'loaded' ).style.display = 'block';
-	
+
 	animate();
 
 }
 
 function animate() {
+
+	var pads = [];
+	var gamepads = navigator.getGamepads();
+	for (var i = 0; i < gamepads.length; ++i) {
+		var gamepad = gamepads[i];
+		if (gamepad && gamepad.pose && gamepad.pose.position ) {
+			pads[ gamepad.index ] = gamepad;
+		}
+	}
+
+	pads.forEach( function( h, id ) {
+		if( h.buttons[ 1 ].pressed ) {
+			sim.simulationShader.uniforms.active.value = 0;
+		} else {
+			sim.simulationShader.uniforms.active.value = 1;
+		}
+		sim.simulationShader.uniforms.timeScale.value = 1 - h.buttons[ 1 ].value;
+	} );
 
 	render();
 	requestAnimationFrame( animate );
@@ -531,6 +551,7 @@ var m = new THREE.Matrix4();
 var v = new THREE.Vector3();
 
 var tmpVector = new THREE.Vector3();
+var time = 0;
 
 function render( timestamp ) {
 
@@ -549,8 +570,16 @@ function render( timestamp ) {
 		proxy.position.copy( nOffset );
 	}
 
-	var delta = t.getDelta() * 10;
-	var time = t.elapsedTime;
+	var delta = t.getDelta() * .75;
+	if( sim.simulationShader.uniforms.active.value === 1 ) {
+		delta *= sim.simulationShader.uniforms.timeScale.value;
+		time += delta;
+		params.scaleX = .6 + .4 * Math.cos( time )
+		params.scaleY = .6 + .4 * Math.cos( .9 * time )
+		params.scaleZ = 1.5 + .5 * Math.cos( 1.1 * time )
+		params.scale = 1.5 + .5 * Math.cos( .1 * time )
+	}
+
 
 	if( inFrame ) {
 		var r = 3;
@@ -565,7 +594,7 @@ function render( timestamp ) {
 	sim.simulationShader.uniforms.evolution.value = params.evolution;
 	sim.simulationShader.uniforms.radius.value = params.pulsate ? ( .5 + .5 * Math.cos( time ) ) * params.radius : params.radius;
 
-	if( sim.simulationShader.uniforms.active.value ) {
+	if( sim.simulationShader.uniforms.active.value === 1 ) {
 		mesh.rotation.y = params.rotation * time;
 	}
 
@@ -574,26 +603,26 @@ function render( timestamp ) {
 	sim.simulationShader.uniforms.genScale.value = scale;
 
 	if( sim.simulationShader.uniforms.active.value === 1 ) {
-		sim.render( time, delta );
+		sim.render( time, delta * 10 );
 	}
 	material.uniforms.map.value = shadowMaterial.uniforms.map.value = sim.targets[ sim.targetPos ];
 	material.uniforms.prevMap.value = shadowMaterial.uniforms.prevMap.value = sim.targets[ 1 - sim.targetPos ];
-	
+
 	material.uniforms.spread.value = params.spread;
 	material.uniforms.timer.value = shadowMaterial.uniforms.timer.value = time;
 	material.uniforms.boxScale.value.set( params.scaleX, params.scaleY, params.scaleZ );
 	shadowMaterial.uniforms.boxScale.value.set( params.scaleX, params.scaleY, params.scaleZ );
 	material.uniforms.meshScale.value = params.scale;
 	shadowMaterial.uniforms.meshScale.value = params.scale;
-	
+
 	renderer.setClearColor( 0 );
-	mesh.material = shadowMaterial;	
+	mesh.material = shadowMaterial;
 	renderer.render( scene, shadowCamera, shadowBuffer );
 
 	tmpVector.copy( scene.position );
 	tmpVector.sub( shadowCamera.position );
 	tmpVector.normalize();
-	
+
 	m.makeRotationY( -mesh.rotation.y );
 	v.copy( shadowCamera.position );
 	v.applyMatrix4( m );
@@ -601,11 +630,11 @@ function render( timestamp ) {
 	material.uniforms.shadowP.value.copy( shadowCamera.projectionMatrix );
 	material.uniforms.shadowV.value.copy( shadowCamera.matrixWorldInverse );
 	material.uniforms.lightPosition.value.copy( v );
-	
+
 	renderer.setClearColor( 0x202020 );
 	mesh.material = material;
 	if( vr ) {
-		manager.render( scene, camera, timestamp );
+		effect.render( scene, camera );
 	} else {
 		renderer.render( scene, camera );
 	}

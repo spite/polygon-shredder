@@ -1,10 +1,10 @@
 function Simulation( renderer, width, height ) {
-	
+
 	this.width = width;
 	this.height = height;
 	this.renderer = renderer;
 	this.targetPos = 0;
-			
+
 	this.data = new Float32Array( this.width * this.height * 4 );
 
 //	var geometry = new THREE.IcosahedronGeometry( 2, 3 );
@@ -37,7 +37,7 @@ function Simulation( renderer, width, height ) {
 
 		this.data[ i * 4 ] = r * Math.sin( theta) * Math.cos( phi );
 		this.data[ i * 4 + 1 ] = r * Math.sin( theta) * Math.sin( phi );
-		this.data[ i * 4 + 2 ] = r * Math.cos( theta );	
+		this.data[ i * 4 + 2 ] = r * Math.cos( theta );
 		this.data[ i * 4 + 3 ] = Math.random() * 100; // frames life
 
 	}
@@ -51,7 +51,7 @@ function Simulation( renderer, width, height ) {
 
 	}.bind( this ) );*/
 
-	
+
 	var floatType = isMobile.apple.device ? THREE.HalfFloatType : THREE.FloatType;
 
 	this.texture = new THREE.DataTexture( this.data, this.width, this.height, THREE.RGBAFormat, THREE.FloatType );
@@ -90,7 +90,8 @@ function Simulation( renderer, width, height ) {
 			factor: { type: 'f', value: .5 },
 			evolution: { type: 'f', value: .5 },
 			inverseModelViewMatrix: { type: 'm4', value: new THREE.Matrix4() },
-			radius: { type: 'f', value: 2 }
+			radius: { type: 'f', value: 2 },
+			timeScale: { type: 'f', value: 1 }
 		},
 
 		vertexShader: document.getElementById('texture_vertex_simulation_shader').textContent,
