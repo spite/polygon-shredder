@@ -13,7 +13,7 @@ function checkFloatTextures() {
 }
 
 function check() {
-	
+
 	if( checkFloatTextures() ) init();
 
 }
@@ -45,7 +45,7 @@ if( Detector.webgl ) {//&& !isMobile.any ) {
 		document.getElementById( 'intro' ).classList.add( 'hidden' );
 		document.getElementById( 'minIntro' ).classList.add( 'hidden' );
 
-		var re = /#frame.([\d]+)/; 
+		var re = /#frame.([\d]+)/;
 		var str = window.location.hash;
 		var m;
 
@@ -53,13 +53,13 @@ if( Detector.webgl ) {//&& !isMobile.any ) {
 			if (m.index === re.lastIndex) {
 				re.lastIndex++;
 			}
-			
+
 			size = m[ 1 ];
 		}
 		inFrame = true;
 
 	} else {
-		size = parseInt( window.location.hash.substr(1) ) || ( isMobile.any ? 32 : 256 ); 
+		size = parseInt( window.location.hash.substr(1) ) || ( isMobile.any ? 32 : 256 );
 	}
 
 	window.addEventListener( 'load', init, false );
@@ -72,7 +72,7 @@ if( Detector.webgl ) {//&& !isMobile.any ) {
 
 var container;
 
-var scene, camera, light, renderer, controls;
+var scene, camera, light, encasing, renderer, controls;
 var geometry, cube, mesh, material, shadowMaterial, plane;
 var timer, start, prevTime;
 
@@ -149,7 +149,7 @@ function init() {
 
 		var sizeOptions = document.getElementById( 'size-options' );
 		var presets = isMobile.any ? presetMobile : presetsDesktop;
-		presets.forEach( function( p ) { 
+		presets.forEach( function( p ) {
 			var span = document.createElement( 'span' );
 			var a = document.createElement( 'a' );
 			a.textContent = p.name;
@@ -157,7 +157,7 @@ function init() {
 			span.appendChild( a );
 			sizeOptions.appendChild( span );
 		} );
-		
+
 	}
 
 	container = document.getElementById( 'container' );
@@ -183,14 +183,14 @@ function init() {
 	shadowCamera.position.set( 10, 4, 10 );
 	shadowCamera.lookAt( scene.position );
 
-	var light = new THREE.Mesh( new THREE.CylinderGeometry( 5, 6, 1, 36 ), new THREE.MeshBasicMaterial( { color: 0xffffff }) );
+	light = new THREE.Mesh( new THREE.CylinderGeometry( 5, 6, 1, 36 ), new THREE.MeshBasicMaterial( { color: 0xffffff }) );
 	light.position.copy( shadowCamera.position );
 	scene.add( light );
 	light.lookAt( scene.position );
 	light.rotation.y += Math.PI / 2;
 	light.rotation.z += Math.PI / 2;
 
-	var encasing = new THREE.Mesh( new THREE.CylinderGeometry( 5.1, 6.1, .9, 36 ), new THREE.MeshBasicMaterial( { color: 0x101010 }) );
+	encasing = new THREE.Mesh( new THREE.CylinderGeometry( 5.1, 6.1, .9, 36 ), new THREE.MeshBasicMaterial( { color: 0x101010 }) );
 	encasing.position.copy( shadowCamera.position );
 	scene.add( encasing );
 	encasing.lookAt( scene.position );
@@ -257,16 +257,16 @@ function init() {
 			spread: { type: 'f', value: 4 },
 			boxScale: { type: 'v3', value: new THREE.Vector3() },
 			meshScale: { type: 'f', value: 1 },
-			
+
 			depthTexture: { type: 't', value: shadowBuffer },
 			shadowV: { type: 'm4', value: new THREE.Matrix4() },
 			shadowP: { type: 'm4', value: new THREE.Matrix4() },
 			resolution: { type: 'v2', value: new THREE.Vector2( shadowBufferSize, shadowBufferSize ) },
 			lightPosition: { type: 'v3', value: new THREE.Vector3() },
 			projector: { type: 't', value: THREE.ImageUtils.loadTexture( 'spotlight.jpg' ) },
-			
-			boxVertices: { type: '3fv', value: [ 
-				
+
+			boxVertices: { type: '3fv', value: [
+
 				-1,-1,-1,
 				-1,-1, 1,
 				-1, 1, 1,
@@ -314,7 +314,7 @@ function init() {
 				1, 1,-1,
 				-1, 1,-1,
 				1, 1, 1
-	
+
 			] },
 			boxNormals: { type: '3fv', value: [
 
@@ -350,9 +350,9 @@ function init() {
 			shadowP: { type: 'm4', value: new THREE.Matrix4() },
 			resolution: { type: 'v2', value: new THREE.Vector2( shadowBufferSize, shadowBufferSize ) },
 			lightPosition: { type: 'v3', value: new THREE.Vector3() },
-			
-			boxVertices: { type: '3fv', value: [ 
-				
+
+			boxVertices: { type: '3fv', value: [
+
 				-1,-1,-1,
 				-1,-1, 1,
 				-1, 1, 1,
@@ -400,7 +400,7 @@ function init() {
 				1, 1,-1,
 				-1, 1,-1,
 				1, 1, 1
-	
+
 			] },
 			boxNormals: { type: '3fv', value: [
 
@@ -432,12 +432,12 @@ function init() {
 	window.addEventListener( 'resize', onWindowResize, false );
 
 	function onWindowResize() {
-		
+
 		camera.aspect = window.innerWidth / window.innerHeight;
 		camera.updateProjectionMatrix();
 
 		renderer.setSize( window.innerWidth, window.innerHeight );
-		
+
 	}
 
 	onWindowResize();
@@ -490,7 +490,7 @@ function init() {
 
 	document.getElementById( 'loading' ).style.display = 'none';
 	document.getElementById( 'loaded' ).style.display = 'block';
-	
+
 	animate();
 
 }
@@ -554,22 +554,26 @@ function render() {
 	}
 	material.uniforms.map.value = shadowMaterial.uniforms.map.value = sim.targets[ sim.targetPos ];
 	material.uniforms.prevMap.value = shadowMaterial.uniforms.prevMap.value = sim.targets[ 1 - sim.targetPos ];
-	
+
 	material.uniforms.spread.value = params.spread;
 	material.uniforms.timer.value = shadowMaterial.uniforms.timer.value = time;
 	material.uniforms.boxScale.value.set( params.scaleX, params.scaleY, params.scaleZ );
 	shadowMaterial.uniforms.boxScale.value.set( params.scaleX, params.scaleY, params.scaleZ );
 	material.uniforms.meshScale.value = params.scale;
 	shadowMaterial.uniforms.meshScale.value = params.scale;
-	
+
 	renderer.setClearColor( 0 );
 	mesh.material = shadowMaterial;
+	light.material.visible = false;
+	encasing.material.visible = false;
 	renderer.render( scene, shadowCamera, shadowBuffer );
+	light.material.visible = true;
+	encasing.material.visible = true;
 
 	tmpVector.copy( scene.position );
 	tmpVector.sub( shadowCamera.position );
 	tmpVector.normalize();
-	
+
 	m.makeRotationY( -mesh.rotation.y );
 	v.copy( shadowCamera.position );
 	v.applyMatrix4( m );
@@ -577,7 +581,7 @@ function render() {
 	material.uniforms.shadowP.value.copy( shadowCamera.projectionMatrix );
 	material.uniforms.shadowV.value.copy( shadowCamera.matrixWorldInverse );
 	material.uniforms.lightPosition.value.copy( v );
-	
+
 	renderer.setClearColor( 0x202020 );
 	mesh.material = material;
 	renderer.render( scene, camera );
