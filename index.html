@@ -103,7 +103,7 @@
 	</div>
 
 <script src="js/isMobile.min.js"></script>
-<script src="js/three.js"></script>
+<script src="js/three.min.js"></script>
 <script src="js/OrbitControls.js"></script>
 <script src="js/Simulation.js"></script>
 <script src="js/dat.gui.min.js"></script>
@@ -487,7 +487,6 @@ uniform mat4 shadowV;
 uniform mat4 shadowP;
 uniform vec3 lightPosition;
 
-varying float vSequence;
 varying vec3 vLightPosition;
 
 uniform sampler2D diffuse;
@@ -587,8 +586,6 @@ uniform sampler2D projector;
 varying vec3 vLightPosition;
 uniform vec2 resolution;
 uniform vec3 cameraPosition;
-
-varying float vSequence;
 
 float bias;
 

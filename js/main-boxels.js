@@ -261,6 +261,11 @@ function init() {
 	diffuseTexture.magFilter = THREE.NearestFilter;
 	diffuseTexture.needsUpdate = true;
 
+	var texLoader = new THREE.TextureLoader();
+	texLoader.load( 'spotlight.jpg', function( res ) {
+		material.uniforms.projector.value = res;
+	} );
+
 	material = new THREE.RawShaderMaterial( {
 
 		uniforms: {
@@ -282,7 +287,7 @@ function init() {
 			shadowP: { type: 'm4', value: new THREE.Matrix4() },
 			resolution: { type: 'v2', value: new THREE.Vector2( shadowBufferSize, shadowBufferSize ) },
 			lightPosition: { type: 'v3', value: new THREE.Vector3() },
-			projector: { type: 't', value: THREE.ImageUtils.loadTexture( 'spotlight.jpg' ) },
+			projector: { type: 't', value: null },
 
 			boxVertices: { type: '3fv', value: [
 
