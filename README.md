@@ -7,6 +7,8 @@ The polygon shredder that takes many cubes and turns them into confetti
 
 A WebGL experiment **write up coming soon!**
 
+Curl Noise GLSL function from [Isaac Cohen's gist](https://github.com/cabbibo/glsl-curl-noise)
+
 # The MIT License (MIT)
 **Copyright &copy; 2016 Jaume Sanchez Elias**
 
