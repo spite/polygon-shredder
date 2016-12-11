@@ -1,6 +1,7 @@
 'use strict'
 
 var halfFloatTextures = false, floatTextures = false;
+var helper;
 
 function checkFloatTextures() {
 
@@ -168,6 +169,9 @@ function init() {
 	renderer.setClearColor( 0xff00ff );
 	container.appendChild( renderer.domElement );
 
+	helper = new FBOHelper( renderer );
+	helper.show( false );
+
 	plane = new THREE.Mesh( new THREE.PlaneGeometry( 10000, 10000 ), new THREE.MeshNormalMaterial( { side: THREE.DoubleSide, visible: true } ) );
 	scene = new THREE.Scene();
 	plane.material.visible = false;
@@ -204,6 +208,8 @@ function init() {
 
 	sim = new Simulation( renderer, size, size );
 
+	helper.attach( sim.rtTexturePos, 'Positions' );
+
 	shadowBufferSize = Math.min( isMobile.any ? 1024 : 2048, renderer.context.getParameter(renderer.context.MAX_TEXTURE_SIZE) );
 	console.log( shadowBufferSize );
 	shadowBuffer = new THREE.WebGLRenderTarget( shadowBufferSize, shadowBufferSize, {
@@ -213,6 +219,8 @@ function init() {
 		magFilter: isMobile.any? THREE.NearestFilter : THREE.LinearFilter,
 		format: THREE.RGBAFormat
 	} );
+
+	helper.attach( shadowBuffer, 'Shadow' );
 
 	var geometry = new THREE.BufferGeometry();
 
@@ -442,6 +450,7 @@ function init() {
 		camera.updateProjectionMatrix();
 
 		renderer.setSize( window.innerWidth, window.innerHeight );
+		helper.setSize( window.innerWidth, window.innerHeight );
 
 	}
 
@@ -590,5 +599,7 @@ function render() {
 	renderer.setClearColor( 0x202020 );
 	mesh.material = material;
 	renderer.render( scene, camera );
+
+	helper.update();
 
 }
