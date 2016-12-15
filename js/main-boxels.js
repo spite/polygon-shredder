@@ -20,6 +20,8 @@ function check() {
 
 }
 
+var vrDisplay;
+
 var size
 var inFrame = false;
 var presetsDesktop = [
@@ -205,20 +207,37 @@ function init() {
 	var b = new THREE.CameraHelper( shadowCamera );
 	//scene.add( b );
 
-	if( vr ) {
-		effect = new THREE.VREffect( renderer );
-		controls = new THREE.VRControls( camera );
-		controls.standing = true;
-		effect.setSize( window.innerWidth, window.innerHeight );
+	if( 'getVRDisplays' in navigator ) {
 
-		var vrParams = {
-			FORCE_ENABLE_VR: true,
-			hideButton: false, // Default: false.
-			isUndistorted: false // Default: false.
-		};
-		manager = new WebVRManager(renderer, effect, vrParams);
+		navigator.getVRDisplays().then(function(displays) {
+			if (displays.length > 0) {
+				vrDisplay = displays[0];
+				effect = new THREE.VREffect( renderer );
+				effect.setVRDisplay( vrDisplay );
+				controls = new THREE.VRControls( camera );
+				controls.standing = true;
+				controls.setVRDisplay( vrDisplay );
+				if (vrDisplay.stageParameters) {
+					//setStageDimensions(vrDisplay.stageParameters);
+				}
+				document.body.appendChild( WEBVR.getButton( effect ) );
+				animate();
+			}
+		});
+
 	} else {
+
+		user.position.y = 1.6;
+		camera.position.set( -.1, 0, 0 );
+		camera.lookAt( new THREE.Vector3( 0, 0, -2 ) );
 		controls = new THREE.OrbitControls( camera, renderer.domElement );
+		effect = {
+			setSize: function( w, h ) { renderer.setSize( w, h ) },
+			requestAnimationFrame: function( c ) { requestAnimationFrame( c ) },
+			render: function( s, c ) { renderer.render( s, c ); }
+		}
+		animate();
+
 	}
 
 	sim = new Simulation( renderer, size, size );
@@ -463,15 +482,11 @@ function init() {
 
 	function onWindowResize() {
 
-		camera.aspect = window.innerWidth / window.innerHeight;
-		camera.updateProjectionMatrix();
-
 		effect.setSize( window.innerWidth, window.innerHeight );
-		//renderer.setSize( window.innerWidth, window.innerHeight );
+		camera.aspect = window.innerWidth / window.innerHeight;
+		camera.updateProjectionMatrix();;
 
 	}
-
-	onWindowResize();
 
 	var isIntersect = false;
 
@@ -522,8 +537,6 @@ function init() {
 	document.getElementById( 'loading' ).style.display = 'none';
 	document.getElementById( 'loaded' ).style.display = 'block';
 
-	animate();
-
 }
 
 function animate() {
@@ -547,7 +560,8 @@ function animate() {
 	} );
 
 	render();
-	requestAnimationFrame( animate );
+
+	effect.requestAnimationFrame( animate );
 
 }
 
@@ -638,10 +652,7 @@ function render( timestamp ) {
 
 	renderer.setClearColor( 0x202020 );
 	mesh.material = material;
-	if( vr ) {
-		effect.render( scene, camera );
-	} else {
-		renderer.render( scene, camera );
-	}
+
+	effect.render( scene, camera );
 
 }
